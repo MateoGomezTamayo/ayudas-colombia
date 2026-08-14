@@ -28,6 +28,9 @@ export const createSolicitud = (data) =>
 export const getPuntosAcopio = (params) =>
   api.get('/puntos-acopio', { params }).then((r) => r.data)
 
+export const submitPuntoPublico = (data) =>
+  api.post('/puntos-acopio', data).then((r) => r.data)
+
 // ── Admin ────────────────────────────────────────────────────────────────────
 export const login = (email, password) =>
   api.post('/auth/login', { email, password }).then((r) => r.data)

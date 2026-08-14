@@ -92,6 +92,18 @@ export default function Dashboard() {
               {emergencias.map((em) => (<option key={em.id} value={em.id}>{em.nombre}</option>))}
             </select>
           </div>
+
+          <div className="flex flex-wrap gap-3 mt-5">
+            <Link to="/solicitar" className="bg-yellow-400 hover:bg-yellow-300 text-gray-900 font-bold px-4 py-2.5 rounded-xl text-sm transition-colors shadow flex items-center gap-2">
+              &#128591; Solicitar Ayuda
+            </Link>
+            <Link to="/agregar-acopio" className="bg-white/10 hover:bg-white/20 text-white font-semibold px-4 py-2.5 rounded-xl text-sm transition-colors border border-white/30 flex items-center gap-2">
+              &#128246; Agregar Punto de Acopio
+            </Link>
+            <Link to="/agregar-albergue" className="bg-white/10 hover:bg-white/20 text-white font-semibold px-4 py-2.5 rounded-xl text-sm transition-colors border border-white/30 flex items-center gap-2">
+              &#127968; Agregar Albergue
+            </Link>
+          </div>
         </div>
       </div>
 

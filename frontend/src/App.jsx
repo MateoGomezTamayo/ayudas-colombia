@@ -4,6 +4,7 @@ import ProtectedRoute from './components/ProtectedRoute'
 import Dashboard from './pages/Dashboard'
 import SolicitarAyuda from './pages/SolicitarAyuda'
 import PuntosAcopio from './pages/PuntosAcopio'
+import AgregarPunto from './pages/AgregarPunto'
 import AdminLogin from './pages/AdminLogin'
 import AdminDashboard from './pages/AdminDashboard'
 import AdminSolicitudes from './pages/AdminSolicitudes'
@@ -18,6 +19,8 @@ export default function App() {
         <Route path="/" element={<Dashboard />} />
         <Route path="/solicitar" element={<SolicitarAyuda />} />
         <Route path="/puntos-acopio" element={<PuntosAcopio />} />
+        <Route path="/agregar-acopio" element={<AgregarPunto tipo="acopio" />} />
+        <Route path="/agregar-albergue" element={<AgregarPunto tipo="refugio" />} />
         <Route path="/admin" element={<AdminLogin />} />
         <Route
           path="/admin/dashboard"
