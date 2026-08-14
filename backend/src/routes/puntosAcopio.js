@@ -8,13 +8,14 @@ const router = require('express').Router();
 const db = require('../db');
 
 router.get('/', async (req, res) => {
-  const { emergencia_id, ciudad, departamento } = req.query;
+  const { emergencia_id, ciudad, departamento, tipo } = req.query;
   const conditions = ['p.activo = TRUE'];
   const params = [];
 
   if (emergencia_id) { params.push(emergencia_id);         conditions.push(`p.emergencia_id = $${params.length}`); }
   if (ciudad)        { params.push(`%${ciudad}%`);         conditions.push(`p.ciudad ILIKE $${params.length}`); }
   if (departamento)  { params.push(`%${departamento}%`);   conditions.push(`p.departamento ILIKE $${params.length}`); }
+  if (tipo)          { params.push(tipo);                  conditions.push(`p.tipo = $${params.length}`); }
 
   try {
     const { rows } = await db.query(

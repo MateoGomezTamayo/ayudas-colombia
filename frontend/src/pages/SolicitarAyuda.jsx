@@ -1,19 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet'
-import L from 'leaflet'
-import 'leaflet/dist/leaflet.css'
 import { getEmergencias, createSolicitud } from '../api'
 
-delete L.Icon.Default.prototype._getIconUrl
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl:
-    'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
-  iconUrl:
-    'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
-  shadowUrl:
-    'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
-})
 
 const CATEGORIAS = [
   { id: 1, nombre: 'Alimentos' },
@@ -29,29 +17,18 @@ const CATEGORIAS = [
 const INPUT_CLASS =
   'w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500'
 
-function LocationPicker({ onSelect, position }) {
-  useMapEvents({
-    click(e) {
-      onSelect(e.latlng.lat, e.latlng.lng)
-    },
-  })
-  return position ? <Marker position={position} /> : null
-}
-
 export default function SolicitarAyuda() {
   const navigate = useNavigate()
   const [emergencias, setEmergencias] = useState([])
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState(null)
-  const [mapPosition, setMapPosition] = useState(null)
 
   const [form, setForm] = useState({
     emergencia_id: '',
     ciudad: '',
     departamento: '',
-    lat: '',
-    lng: '',
+    direccion: '',
     nombre_solicitante: '',
     contacto: '',
     descripcion: '',
@@ -70,11 +47,6 @@ export default function SolicitarAyuda() {
       })
       .catch(() => {})
   }, [])
-
-  const handleMapSelect = (lat, lng) => {
-    setMapPosition([lat, lng])
-    setForm((f) => ({ ...f, lat: lat.toFixed(6), lng: lng.toFixed(6) }))
-  }
 
   const handleChange = (e) => {
     setForm((f) => ({ ...f, [e.target.name]: e.target.value }))
@@ -108,8 +80,8 @@ export default function SolicitarAyuda() {
       await createSolicitud({
         ...form,
         emergencia_id: Number(form.emergencia_id),
-        lat: form.lat ? Number(form.lat) : null,
-        lng: form.lng ? Number(form.lng) : null,
+        lat: null,
+        lng: null,
         items: items.map((it) => ({
           ...it,
           categoria_id: Number(it.categoria_id),
@@ -217,49 +189,17 @@ export default function SolicitarAyuda() {
                 </div>
               </div>
 
-              {/* Location picker map */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Ubicación en el mapa
+                  Direccion
                 </label>
-                <p className="text-xs text-gray-400 mb-2">
-                  Haz clic en el mapa para seleccionar tu ubicación exacta
-                </p>
-                <div className="rounded-lg overflow-hidden border border-gray-200">
-                  <MapContainer center={[4.5, -74.0]} zoom={5} style={{ height: '200px' }}>
-                    <TileLayer
-                      attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                    />
-                    <LocationPicker onSelect={handleMapSelect} position={mapPosition} />
-                  </MapContainer>
-                </div>
-                <div className="grid grid-cols-2 gap-3 mt-2">
-                  <div>
-                    <label className="block text-xs text-gray-500 mb-1">Latitud</label>
-                    <input
-                      name="lat"
-                      value={form.lat}
-                      onChange={handleChange}
-                      type="number"
-                      step="any"
-                      placeholder="4.6097"
-                      className={INPUT_CLASS}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs text-gray-500 mb-1">Longitud</label>
-                    <input
-                      name="lng"
-                      value={form.lng}
-                      onChange={handleChange}
-                      type="number"
-                      step="any"
-                      placeholder="-74.0817"
-                      className={INPUT_CLASS}
-                    />
-                  </div>
-                </div>
+                <input
+                  name="direccion"
+                  value={form.direccion}
+                  onChange={handleChange}
+                  placeholder="Ej: Calle 10 # 5-32, Barrio La Esperanza"
+                  className={INPUT_CLASS}
+                />
               </div>
 
               <div>

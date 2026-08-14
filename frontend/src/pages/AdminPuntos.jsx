@@ -25,6 +25,7 @@ const EMPTY_FORM = {
   telefono: '',
   acepta: [],
   activo: true,
+  tipo: 'acopio',
 }
 
 const INPUT_CLASS =
@@ -309,6 +310,14 @@ export default function AdminPuntos() {
                       </label>
                     ))}
                   </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Tipo</label>
+                  <select name="tipo" value={form.tipo} onChange={handleChange} className={INPUT_CLASS}>
+                    <option value="acopio">Punto de Acopio</option>
+                    <option value="refugio">Refugio</option>
+                  </select>
                 </div>
 
                 <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer select-none">

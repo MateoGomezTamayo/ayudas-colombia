@@ -24,14 +24,14 @@ router.get('/', async (_req, res) => {
 });
 
 router.post('/', async (req, res) => {
-  const { nombre, ciudad, departamento, direccion, lat, lng, horario, contacto, telefono, que_acepta, emergencia_id } = req.body;
+  const { nombre, ciudad, departamento, direccion, lat, lng, horario, contacto, telefono, que_acepta, emergencia_id, tipo } = req.body;
   if (!nombre || !ciudad) return res.status(400).json({ error: 'Nombre y ciudad son requeridos' });
   try {
     const { rows } = await db.query(
       `INSERT INTO puntos_acopio
-         (nombre, ciudad, departamento, direccion, lat, lng, horario, contacto, telefono, que_acepta, emergencia_id)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) RETURNING *`,
-      [nombre, ciudad, departamento, direccion, lat, lng, horario, contacto, telefono, que_acepta, emergencia_id]
+         (nombre, ciudad, departamento, direccion, lat, lng, horario, contacto, telefono, que_acepta, emergencia_id, tipo)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12) RETURNING *`,
+      [nombre, ciudad, departamento, direccion, lat, lng, horario, contacto, telefono, que_acepta, emergencia_id, tipo || 'acopio']
     );
     res.status(201).json(rows[0]);
   } catch (err) {
@@ -42,7 +42,7 @@ router.post('/', async (req, res) => {
 
 router.patch('/:id', async (req, res) => {
   const { id } = req.params;
-  const { nombre, ciudad, departamento, direccion, lat, lng, horario, contacto, telefono, que_acepta, activo, emergencia_id } = req.body;
+  const { nombre, ciudad, departamento, direccion, lat, lng, horario, contacto, telefono, que_acepta, activo, emergencia_id, tipo } = req.body;
   try {
     const { rows } = await db.query(
       `UPDATE puntos_acopio SET
@@ -58,9 +58,10 @@ router.patch('/:id', async (req, res) => {
          que_acepta    = COALESCE($10, que_acepta),
          activo        = COALESCE($11, activo),
          emergencia_id = COALESCE($12, emergencia_id),
+         tipo          = COALESCE($13, tipo),
          updated_at    = NOW()
-       WHERE id = $13 RETURNING *`,
-      [nombre, ciudad, departamento, direccion, lat, lng, horario, contacto, telefono, que_acepta, activo, emergencia_id, id]
+       WHERE id = $14 RETURNING *`,
+      [nombre, ciudad, departamento, direccion, lat, lng, horario, contacto, telefono, que_acepta, activo, emergencia_id, tipo, id]
     );
     if (!rows[0]) return res.status(404).json({ error: 'Punto de acopio no encontrado' });
     res.json(rows[0]);
