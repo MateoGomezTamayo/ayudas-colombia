@@ -17,7 +17,7 @@ const IcoBox = () => (
 )
 const IcoBed = () => (
   <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M7 13c1.66 0 3-1.34 3-3S8.66 7 7 7s-3 1.34-3 3 1.34 3 3 3zm12-6h-8v7H3V5H1v15h2v-3h18v3h2v-9c0-2.21-1.79-4-4-4z"/>
+    <path d="M21 7.5a2.5 2.5 0 0 0-2.5-2.5c-.3 0-.6.05-.87.15A2.5 2.5 0 0 0 15.5 3c-.62 0-1.19.22-1.63.58A2.5 2.5 0 0 0 9.5 5c-.3 0-.6.05-.87.15A2.5 2.5 0 0 0 4 7.5v8.69l-1.87-1.87L.7 15.74 4.63 19.67A8 8 0 0 0 10.3 22H14a8 8 0 0 0 8-8V7.5zM20 14a6 6 0 0 1-6 6h-3.7a6 6 0 0 1-4.25-1.76L4 16.17V7.5C4 6.67 4.67 6 5.5 6S7 6.67 7 7.5V12h2V5.5C9 4.67 9.67 4 10.5 4S12 4.67 12 5.5V12h2V5.5c0-.83.67-1.5 1.5-1.5S17 4.67 17 5.5V12h2V7.5c0-.83.67-1.5 1.5-1.5S22 6.67 22 7.5"/>
   </svg>
 )
 const IcoHeart = () => (
@@ -90,9 +90,9 @@ export default function BottomNav() {
         }}>+</Link>
       </div>
 
-      <Link to="/albergues" style={tab(pathname === '/albergues')}>
+      <Link to="/voluntariado" style={tab(pathname === '/voluntariado')}>
         <IcoBed />
-        <span>Albergue</span>
+        <span>Voluntarios</span>
       </Link>
 
       <Link to="/ayudas" style={tab(pathname === '/ayudas')}>

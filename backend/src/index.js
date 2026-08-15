@@ -15,6 +15,7 @@ const cache30 = (_req, res, next) => { res.set('Cache-Control', 'public, max-age
 app.use('/api/emergencias', cache30, require('./routes/emergencias'));
 app.use('/api/puntos-acopio', cache30, require('./routes/puntosAcopio'));
 app.use('/api/solicitudes', cache30, require('./routes/solicitudes'));
+app.use('/api/voluntarios', cache30, require('./routes/voluntarios'));
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/admin/solicitudes', require('./routes/adminSolicitudes'));
 app.use('/api/admin/puntos-acopio', require('./routes/adminPuntos'));

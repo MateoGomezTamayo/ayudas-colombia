@@ -8,6 +8,7 @@ import PuntosAcopio from './pages/PuntosAcopio'
 import ListaPuntos from './pages/ListaPuntos'
 import AgregarPunto from './pages/AgregarPunto'
 import Ayudas from './pages/Ayudas'
+import Voluntariado from './pages/Voluntariado'
 import AdminLogin from './pages/AdminLogin'
 import AdminDashboard from './pages/AdminDashboard'
 import AdminSolicitudes from './pages/AdminSolicitudes'
@@ -26,6 +27,7 @@ export default function App() {
         <Route path="/acopio" element={<ListaPuntos tipo="acopio" />} />
         <Route path="/albergues" element={<ListaPuntos tipo="refugio" />} />
         <Route path="/ayudas" element={<Ayudas />} />
+        <Route path="/voluntariado" element={<Voluntariado />} />
         <Route path="/puntos-acopio" element={<PuntosAcopio />} />
         <Route path="/agregar-acopio" element={<AgregarPunto tipo="acopio" />} />
         <Route path="/agregar-albergue" element={<AgregarPunto tipo="refugio" />} />
