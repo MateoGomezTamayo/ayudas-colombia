@@ -4,35 +4,86 @@ import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { getEmergencias, getSolicitudes, getPuntosAcopio } from '../api'
-import SolicitudCard from '../components/SolicitudCard'
 
 delete L.Icon.Default.prototype._getIconUrl
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
-  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+
+function pin(color) {
+  return L.divIcon({
+    html: `<div style="width:32px;height:32px;background:${color};border-radius:50%;border:3px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.5);"></div>`,
+    className: '',
+    iconSize: [32, 32],
+    iconAnchor: [16, 16],
+  })
+}
+
+const C = {
+  dark: '#0d1117',
+  card: '#161b22',
+  border: '#30363d',
+  text: '#f0f6fc',
+  muted: '#8b949e',
+  blue: '#1d4ed8',
+  blueLight: '#58a6ff',
+  green: '#16a34a',
+  greenLight: '#4ade80',
+  red: '#dc2626',
+  redLight: '#f87171',
+}
+
+const IcoHome = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
+  </svg>
+)
+
+const IcoBox = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M20 7h-4V4c0-1.1-.9-2-2-2h-4c-1.1 0-2 .9-2 2v3H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2zM10 4h4v3h-4V4z" />
+  </svg>
+)
+
+const IcoHeart = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+  </svg>
+)
+
+const IcoSearch = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <circle cx="11" cy="11" r="8" />
+    <line x1="21" y1="21" x2="16.65" y2="16.65" />
+  </svg>
+)
+
+const IcoPin = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" />
+  </svg>
+)
+
+const IcoGrid = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M3 3h8v8H3zm10 0h8v8h-8zM3 13h8v8H3zm10 0h8v8h-8z" />
+  </svg>
+)
+
+const IcoPerson = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+  </svg>
+)
+
+const navLink = (active) => ({
+  flex: 1,
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  gap: 4,
+  textDecoration: 'none',
+  color: active ? C.blueLight : C.muted,
+  fontSize: 10,
+  fontWeight: active ? 600 : 400,
 })
-
-const PRIORITY_COLORS = { alta: '#dc2626', media: '#ea580c', baja: '#16a34a' }
-
-function createPriorityIcon(prioridad) {
-  const color = PRIORITY_COLORS[prioridad] || '#6b7280'
-  return L.divIcon({
-    html: `<div style="background:${color};width:16px;height:16px;border-radius:50%;border:2px solid white;box-shadow:0 1px 4px rgba(0,0,0,0.4)"></div>`,
-    className: '',
-    iconSize: [16, 16],
-    iconAnchor: [8, 8],
-  })
-}
-
-function createPuntoIcon() {
-  return L.divIcon({
-    html: '<div style="background:#1d4ed8;width:22px;height:22px;border-radius:4px;border:2px solid white;box-shadow:0 1px 4px rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;font-size:13px;line-height:1;">&#128246;</div>',
-    className: '',
-    iconSize: [22, 22],
-    iconAnchor: [11, 11],
-  })
-}
 
 export default function Dashboard() {
   const [emergencias, setEmergencias] = useState([])
@@ -40,22 +91,19 @@ export default function Dashboard() {
   const [solicitudes, setSolicitudes] = useState([])
   const [puntos, setPuntos] = useState([])
   const [refugios, setRefugios] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+  const [search, setSearch] = useState('')
 
   useEffect(() => {
     getEmergencias()
-      .then((data) => {
+      .then(data => {
         setEmergencias(data)
-        if (data.length > 0) setSelectedEmergencia(String(data[0].id))
+        if (data.length) setSelectedEmergencia(String(data[0].id))
       })
-      .catch(() => setError('No se pudieron cargar las emergencias'))
+      .catch(() => {})
   }, [])
 
   useEffect(() => {
     if (!selectedEmergencia) return
-    setLoading(true)
-    setError(null)
     Promise.all([
       getSolicitudes({ emergencia_id: selectedEmergencia }),
       getPuntosAcopio({ emergencia_id: selectedEmergencia, tipo: 'acopio' }),
@@ -66,176 +114,215 @@ export default function Dashboard() {
         setPuntos(pts)
         setRefugios(refs)
       })
-      .catch(() => setError('Error cargando datos de la emergencia'))
-      .finally(() => setLoading(false))
+      .catch(() => {})
   }, [selectedEmergencia])
 
-  const stats = {
-    total: solicitudes.length,
-    alta: solicitudes.filter((s) => s.prioridad === 'alta').length,
-    en_proceso: solicitudes.filter((s) => s.estado === 'en_proceso').length,
-    cubiertos: solicitudes.filter((s) => s.estado === 'cubierto').length,
-  }
-
-  const urgentes = solicitudes.filter((s) => s.prioridad === 'alta').slice(0, 6)
+  const urgentes = solicitudes.filter(s => s.prioridad === 'alta').length
+  const emergenciaActiva = emergencias[0]
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="text-white py-8 px-4" style={{ background: 'linear-gradient(135deg, #003893 0%, #1d4ed8 100%)' }}>
-        <div className="max-w-6xl mx-auto">
-          <h1 className="text-2xl md:text-3xl font-bold mb-1">Sistema de Ayudas Humanitarias Colombia</h1>
-          <p className="text-blue-200 text-sm mb-4">Coordinacion de ayuda en emergencias nacionales</p>
-          <div className="flex flex-wrap items-center gap-3">
-            <label className="font-medium text-sm text-blue-100">Emergencia activa:</label>
-            <select value={selectedEmergencia} onChange={(e) => setSelectedEmergencia(e.target.value)} className="bg-blue-800 text-white border border-blue-600 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400">
-              {emergencias.length === 0 && <option value="">Sin emergencias activas</option>}
-              {emergencias.map((em) => (<option key={em.id} value={em.id}>{em.nombre}</option>))}
-            </select>
-          </div>
+    <div style={{ background: C.dark, minHeight: '100vh', color: C.text, fontFamily: 'system-ui,-apple-system,sans-serif', paddingBottom: 100 }}>
 
-          <div className="flex flex-wrap gap-3 mt-5">
-            <Link to="/solicitar" className="bg-yellow-400 hover:bg-yellow-300 text-gray-900 font-bold px-4 py-2.5 rounded-xl text-sm transition-colors shadow flex items-center gap-2">
-              &#128591; Solicitar Ayuda
-            </Link>
-            <Link to="/agregar-acopio" className="bg-white/10 hover:bg-white/20 text-white font-semibold px-4 py-2.5 rounded-xl text-sm transition-colors border border-white/30 flex items-center gap-2">
-              &#128246; Agregar Punto de Acopio
-            </Link>
-            <Link to="/agregar-albergue" className="bg-white/10 hover:bg-white/20 text-white font-semibold px-4 py-2.5 rounded-xl text-sm transition-colors border border-white/30 flex items-center gap-2">
-              &#127968; Agregar Albergue
-            </Link>
+      {/* Header */}
+      <div style={{ padding: '24px 18px 10px', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+        <div>
+          <h1 style={{ fontSize: 24, fontWeight: 800, margin: 0, letterSpacing: -0.5 }}>Encuentra ayuda</h1>
+          <p style={{ fontSize: 13, color: C.muted, marginTop: 4, marginBottom: 0 }}>
+            {emergenciaActiva ? emergenciaActiva.nombre : 'Colombia'}
+          </p>
+        </div>
+        {urgentes > 0 && (
+          <div style={{ background: C.red, borderRadius: 20, padding: '5px 13px', fontSize: 12, fontWeight: 700, flexShrink: 0, marginTop: 4 }}>
+            {urgentes} urgentes
           </div>
+        )}
+      </div>
+
+      {/* Search */}
+      <div style={{ padding: '6px 18px 16px' }}>
+        <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 14, padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 10 }}>
+          <span style={{ color: C.muted, display: 'flex', flexShrink: 0 }}>
+            <IcoSearch />
+          </span>
+          <input
+            style={{ background: 'none', border: 'none', outline: 'none', color: C.text, fontSize: 14, width: '100%' }}
+            placeholder="Buscar albergues, acopio, ayuda..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+          />
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 py-6">
-        {error && <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 mb-4 text-sm">{error}</div>}
-
-        {!loading && puntos.length > 0 && (
-          <div className="mb-6">
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="text-lg font-semibold text-gray-800">Puntos de Acopio</h2>
-              <Link to="/puntos-acopio" className="text-blue-600 hover:underline text-sm">Ver todos</Link>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {puntos.map((p) => (
-                <div key={p.id} className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
-                  <div className="bg-blue-600 px-4 py-3">
-                    <h3 className="font-bold text-white text-sm">{p.nombre}</h3>
-                    <p className="text-blue-200 text-xs mt-0.5">{p.ciudad}{p.departamento ? `, ${p.departamento}` : ''}</p>
-                  </div>
-                  <div className="px-4 py-3 space-y-1 text-sm text-gray-600">
-                    {p.direccion && <p>{p.direccion}</p>}
-                    {p.horario && <p>Horario: {p.horario}</p>}
-                    {p.telefono && <p>Tel: <a href={`tel:${p.telefono}`} className="text-blue-600">{p.telefono}</a></p>}
-                  </div>
+      {/* Urgentes alert banner */}
+      {urgentes > 0 && (
+        <Link to="/ayudas" style={{ display: 'block', margin: '0 18px 16px', textDecoration: 'none' }}>
+          <div style={{
+            background: 'linear-gradient(135deg,#7f1d1d,#dc2626)',
+            borderRadius: 14, padding: '13px 16px',
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            gap: 12,
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'white', animation: 'pulse 1.5s infinite' }} />
+              <div>
+                <div style={{ fontWeight: 700, fontSize: 13, color: 'white' }}>
+                  {urgentes} solicitud{urgentes > 1 ? 'es' : ''} urgente{urgentes > 1 ? 's' : ''}
                 </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Refugios */}
-        {!loading && refugios.length > 0 && (
-          <div className="mb-6">
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="text-lg font-semibold text-gray-800">🏠 Refugios</h2>
-              <Link to="/puntos-acopio" className="text-blue-600 hover:underline text-sm">Ver todos</Link>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {refugios.map((p) => (
-                <div key={p.id} className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
-                  <div className="bg-green-600 px-4 py-3">
-                    <h3 className="font-bold text-white text-sm">{p.nombre}</h3>
-                    <p className="text-green-200 text-xs mt-0.5">{p.ciudad}{p.departamento ? `, ${p.departamento}` : ''}</p>
-                  </div>
-                  <div className="px-4 py-3 space-y-1 text-sm text-gray-600">
-                    {p.direccion && <p>{p.direccion}</p>}
-                    {p.horario && <p>Horario: {p.horario}</p>}
-                    {p.telefono && <p>Tel: <a href={`tel:${p.telefono}`} className="text-blue-600">{p.telefono}</a></p>}
-                  </div>
+                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.75)', marginTop: 2 }}>
+                  Personas necesitan ayuda ahora
                 </div>
-              ))}
+              </div>
             </div>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="white">
+              <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
+            </svg>
           </div>
-        )}
+        </Link>
+      )}
 
-        {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 text-center">
-            <div className="text-3xl font-bold text-gray-800">{stats.total}</div>
-            <div className="text-xs text-gray-500 mt-1">Total Solicitudes</div>
-          </div>
-          <div className="bg-white rounded-xl shadow-sm border border-red-100 p-4 text-center">
-            <div className="text-3xl font-bold text-red-600">{stats.alta}</div>
-            <div className="text-xs text-gray-500 mt-1">Alta Prioridad</div>
-          </div>
-          <div className="bg-white rounded-xl shadow-sm border border-blue-100 p-4 text-center">
-            <div className="text-3xl font-bold text-blue-600">{stats.en_proceso}</div>
-            <div className="text-xs text-gray-500 mt-1">En Proceso</div>
-          </div>
-          <div className="bg-white rounded-xl shadow-sm border border-green-100 p-4 text-center">
-            <div className="text-3xl font-bold text-green-600">{stats.cubiertos}</div>
-            <div className="text-xs text-gray-500 mt-1">Cubiertos</div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mb-6">
-          <div className="px-4 py-3 border-b border-gray-100 flex flex-wrap items-center justify-between gap-2">
-            <h2 className="font-semibold text-gray-700 text-sm">Mapa de solicitudes y puntos de acopio</h2>
-            <div className="flex flex-wrap gap-3 text-xs text-gray-500">
-              <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-full bg-red-600 inline-block" />Alta</span>
-              <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-full bg-orange-500 inline-block" />Media</span>
-              <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-full bg-green-600 inline-block" />Baja</span>
-              <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-blue-700 inline-block" />Punto Acopio</span>
-            </div>
-          </div>
-          <MapContainer center={[4.5, -74.0]} zoom={6} style={{ height: '400px' }}>
-            <TileLayer attribution='&copy; OpenStreetMap' url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-            {solicitudes.filter((s) => s.lat && s.lng).map((s) => (
-              <Marker key={`sol-${s.id}`} position={[s.lat, s.lng]} icon={createPriorityIcon(s.prioridad)}>
-                <Popup>
-                  <div className="text-sm space-y-1">
-                    <p className="font-semibold">{s.ciudad}{s.departamento ? `, ${s.departamento}` : ''}</p>
-                    <p>Prioridad: <span style={{ color: PRIORITY_COLORS[s.prioridad] }}>{s.prioridad}</span></p>
-                    {s.descripcion && <p>{s.descripcion}</p>}
-                    {s.items && s.items.map((it, i) => <p key={i}>{it.producto}: {it.cantidad} {it.unidad}</p>)}
-                  </div>
-                </Popup>
-              </Marker>
-            ))}
-            {puntos.filter((p) => p.lat && p.lng).map((p) => (
-              <Marker key={`pt-${p.id}`} position={[p.lat, p.lng]} icon={createPuntoIcon()}>
-                <Popup>
-                  <div className="text-sm space-y-1">
-                    <p className="font-semibold">{p.nombre}</p>
-                    <p>{p.ciudad}{p.departamento ? `, ${p.departamento}` : ''}</p>
-                    {p.direccion && <p>{p.direccion}</p>}
-                    {p.horario && <p>Horario: {p.horario}</p>}
-                    {p.telefono && <p>Tel: {p.telefono}</p>}
-                  </div>
-                </Popup>
-              </Marker>
-            ))}
-          </MapContainer>
-        </div>
-
-        {loading ? (
-          <div className="text-center py-12 text-gray-400 text-sm">Cargando solicitudes...</div>
-        ) : urgentes.length > 0 ? (
-          <div className="mb-8">
-            <h2 className="text-lg font-semibold text-gray-800 mb-3">Solicitudes urgentes <span className="ml-2 text-sm font-normal text-red-500">({urgentes.length} de alta prioridad)</span></h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {urgentes.map((s) => <SolicitudCard key={s.id} solicitud={s} />)}
-            </div>
-          </div>
-        ) : selectedEmergencia ? (
-          <div className="text-center py-12 text-gray-400 text-sm">No hay solicitudes urgentes para esta emergencia</div>
-        ) : null}
+      {/* Map */}
+      <div style={{ margin: '0 18px', borderRadius: 18, overflow: 'hidden', border: `1px solid ${C.border}` }}>
+        <MapContainer center={[4.5, -74.0]} zoom={6} style={{ height: 240 }} zoomControl={false}>
+          <TileLayer
+            url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+            attribution="&copy; CartoDB"
+          />
+          {solicitudes.filter(s => s.lat && s.lng).map(s => (
+            <Marker key={'s' + s.id} position={[s.lat, s.lng]} icon={pin('#ef4444')}>
+              <Popup><b>{s.ciudad}</b><br />{s.descripcion}</Popup>
+            </Marker>
+          ))}
+          {puntos.filter(p => p.lat && p.lng).map(p => (
+            <Marker key={'p' + p.id} position={[p.lat, p.lng]} icon={pin('#22c55e')}>
+              <Popup><b>{p.nombre}</b><br />{p.ciudad}</Popup>
+            </Marker>
+          ))}
+          {refugios.filter(r => r.lat && r.lng).map(r => (
+            <Marker key={'r' + r.id} position={[r.lat, r.lng]} icon={pin('#3b82f6')}>
+              <Popup><b>{r.nombre}</b><br />{r.ciudad}</Popup>
+            </Marker>
+          ))}
+        </MapContainer>
       </div>
 
-      <Link to="/solicitar" className="fixed bottom-6 right-6 text-white font-semibold px-5 py-3 rounded-full shadow-lg flex items-center gap-2 text-sm" style={{ background: '#16a34a' }}>
-        <span className="text-lg leading-none">+</span> Solicitar Ayuda
-      </Link>
+      {/* Actions */}
+      <div style={{ padding: '22px 18px 0' }}>
+        <div style={{ fontSize: 11, fontWeight: 700, color: C.muted, marginBottom: 14, textTransform: 'uppercase', letterSpacing: 1.2 }}>
+          Que necesitas?
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
+          {/* Albergues */}
+          <Link
+            to="/albergues"
+            style={{ background: 'linear-gradient(135deg,#1e3a5f,#1d4ed8)', borderRadius: 18, padding: '18px 16px', display: 'flex', flexDirection: 'column', gap: 10, textDecoration: 'none', position: 'relative', overflow: 'hidden', minHeight: 124 }}
+          >
+            {refugios.length > 0 && (
+              <div style={{ position: 'absolute', top: 12, right: 12, background: 'rgba(0,0,0,0.4)', color: '#93c5fd', borderRadius: 20, padding: '2px 9px', fontSize: 11, fontWeight: 700 }}>
+                {refugios.length}
+              </div>
+            )}
+            <span style={{ color: 'rgba(255,255,255,0.9)', display: 'flex' }}>
+              <svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
+              </svg>
+            </span>
+            <div>
+              <div style={{ fontWeight: 700, fontSize: 15, color: '#fff' }}>Albergues</div>
+              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.65)', marginTop: 3 }}>
+                {refugios.length ? `${refugios.length} disponibles` : 'Lugares seguros'}
+              </div>
+            </div>
+          </Link>
+
+          {/* Acopio */}
+          <Link
+            to="/acopio"
+            style={{ background: 'linear-gradient(135deg,#14532d,#16a34a)', borderRadius: 18, padding: '18px 16px', display: 'flex', flexDirection: 'column', gap: 10, textDecoration: 'none', position: 'relative', overflow: 'hidden', minHeight: 124 }}
+          >
+            {puntos.length > 0 && (
+              <div style={{ position: 'absolute', top: 12, right: 12, background: 'rgba(0,0,0,0.4)', color: '#86efac', borderRadius: 20, padding: '2px 9px', fontSize: 11, fontWeight: 700 }}>
+                {puntos.length}
+              </div>
+            )}
+            <span style={{ color: 'rgba(255,255,255,0.9)', display: 'flex' }}>
+              <svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M20 7h-4V4c0-1.1-.9-2-2-2h-4c-1.1 0-2 .9-2 2v3H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2zM10 4h4v3h-4V4z" />
+              </svg>
+            </span>
+            <div>
+              <div style={{ fontWeight: 700, fontSize: 15, color: '#fff' }}>Acopio</div>
+              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.65)', marginTop: 3 }}>
+                {puntos.length ? `${puntos.length} puntos activos` : 'Puntos de donacion'}
+              </div>
+            </div>
+          </Link>
+        </div>
+
+        {/* Pide Ayuda â€” full width */}
+        <Link
+          to="/solicitar"
+          style={{ background: 'linear-gradient(135deg,#7c2d12,#dc2626)', borderRadius: 18, padding: '20px 22px', display: 'flex', alignItems: 'center', gap: 18, textDecoration: 'none', marginBottom: 10 }}
+        >
+          <span style={{ color: 'rgba(255,255,255,0.9)', display: 'flex', flexShrink: 0 }}>
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+            </svg>
+          </span>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontWeight: 800, fontSize: 18, color: '#fff', letterSpacing: -0.3 }}>Pide Ayuda</div>
+            <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.65)', marginTop: 3 }}>
+              {urgentes ? `${urgentes} solicitudes urgentes activas` : 'Registra tu solicitud ahora'}
+            </div>
+          </div>
+          {urgentes > 0 && (
+            <div style={{ background: 'rgba(0,0,0,0.35)', color: '#fca5a5', borderRadius: 20, padding: '4px 13px', fontSize: 13, fontWeight: 700, flexShrink: 0 }}>
+              {urgentes}
+            </div>
+          )}
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.5)" strokeWidth="2.5">
+            <polyline points="9 18 15 12 9 6" />
+          </svg>
+        </Link>
+      </div>
+
+      {/* Urgentes list preview */}
+      {solicitudes.filter(s => s.prioridad === 'alta' && s.estado !== 'cubierto').slice(0, 3).length > 0 && (
+        <div style={{ padding: '20px 18px 0' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+            <span style={{ fontSize: 13, fontWeight: 700, color: C.text }}>Necesitan ayuda ahora</span>
+            <Link to="/ayudas" style={{ fontSize: 12, color: C.blueLight, textDecoration: 'none' }}>Ver todas</Link>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {solicitudes.filter(s => s.prioridad === 'alta' && s.estado !== 'cubierto').slice(0, 3).map(s => (
+              <Link key={s.id} to="/ayudas" style={{ textDecoration: 'none' }}>
+                <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 14, padding: '12px 14px', display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#ef4444', flexShrink: 0 }} />
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontWeight: 600, fontSize: 13, color: C.text, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      {s.ciudad}{s.departamento ? `, ${s.departamento}` : ''}
+                    </div>
+                    {s.descripcion && (
+                      <div style={{ fontSize: 11, color: C.muted, marginTop: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {s.descripcion}
+                      </div>
+                    )}
+                    {s.items?.length > 0 && (
+                      <div style={{ fontSize: 11, color: '#f59e0b', marginTop: 2 }}>
+                        {s.items.slice(0, 2).map(it => it.producto).join(', ')}{s.items.length > 2 ? '...' : ''}
+                      </div>
+                    )}
+                  </div>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill={C.muted}>
+                    <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
+                  </svg>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
+
     </div>
   )
 }

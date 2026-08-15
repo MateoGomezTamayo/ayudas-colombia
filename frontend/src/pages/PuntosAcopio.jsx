@@ -52,21 +52,22 @@ export default function PuntosAcopio() {
   )
 
   return (
-    <div className="min-h-screen bg-gray-50 py-6">
+    <div className="min-h-screen py-6" style={{ background: '#0d1117' }}>
       <div className="max-w-6xl mx-auto px-4">
-        <h1 className="text-2xl font-bold text-gray-900 mb-1">Puntos de Acopio</h1>
-        <p className="text-gray-500 text-sm mb-5">
+        <h1 className="text-2xl font-bold mb-1" style={{ color: '#f0f6fc' }}>Puntos de Acopio</h1>
+        <p className="text-sm mb-5" style={{ color: '#8b949e' }}>
           Centros de recolección y distribución de ayuda humanitaria
         </p>
 
         {/* Filters */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-5 flex flex-wrap gap-4">
+        <div className="rounded-xl p-4 mb-5 flex flex-wrap gap-4" style={{ background: '#161b22', border: '1px solid #30363d' }}>
           <div>
-            <label className="block text-xs font-medium text-gray-500 mb-1">Emergencia</label>
+            <label className="block text-xs font-medium mb-1" style={{ color: '#8b949e' }}>Emergencia</label>
             <select
               value={filtros.emergencia_id}
               onChange={(e) => setFiltros((f) => ({ ...f, emergencia_id: e.target.value }))}
-              className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 min-w-[180px]"
+              className="rounded-lg px-3 py-2 text-sm focus:outline-none min-w-[180px]"
+              style={{ background: '#161b22', color: '#f0f6fc', border: '1px solid #30363d' }}
             >
               <option value="">Todas las emergencias</option>
               {emergencias.map((em) => (
@@ -77,18 +78,19 @@ export default function PuntosAcopio() {
             </select>
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-500 mb-1">
+            <label className="block text-xs font-medium mb-1" style={{ color: '#8b949e' }}>
               Ciudad / Departamento
             </label>
             <input
               value={filtros.ciudad}
               onChange={(e) => setFiltros((f) => ({ ...f, ciudad: e.target.value }))}
               placeholder="Buscar ciudad..."
-              className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 min-w-[200px]"
+              className="rounded-lg px-3 py-2 text-sm focus:outline-none min-w-[200px]"
+              style={{ background: '#161b22', color: '#f0f6fc', border: '1px solid #30363d' }}
             />
           </div>
           <div className="flex items-end">
-            <span className="text-sm text-gray-400">
+            <span className="text-sm" style={{ color: '#8b949e' }}>
               {puntosFiltrados.length} punto{puntosFiltrados.length !== 1 ? 's' : ''} encontrado
               {puntosFiltrados.length !== 1 ? 's' : ''}
             </span>
@@ -96,13 +98,13 @@ export default function PuntosAcopio() {
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 mb-4 text-sm">
+          <div className="rounded-lg p-3 mb-4 text-sm" style={{ background: '#1a0a0a', border: '1px solid #dc2626', color: '#f87171' }}>
             {error}
           </div>
         )}
 
         {/* Map */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mb-5">
+        <div className="rounded-xl overflow-hidden mb-5" style={{ border: '1px solid #30363d' }}>
           <MapContainer center={[4.5, -74.0]} zoom={6} style={{ height: '360px' }}>
             <TileLayer
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
@@ -131,11 +133,11 @@ export default function PuntosAcopio() {
 
         {/* Cards */}
         {loading ? (
-          <div className="text-center py-12 text-gray-400 text-sm">
+          <div className="text-center py-12 text-sm" style={{ color: '#8b949e' }}>
             Cargando puntos de acopio...
           </div>
         ) : puntosFiltrados.length === 0 ? (
-          <div className="text-center py-12 text-gray-400 text-sm">
+          <div className="text-center py-12 text-sm" style={{ color: '#8b949e' }}>
             No se encontraron puntos de acopio
           </div>
         ) : (
@@ -143,19 +145,18 @@ export default function PuntosAcopio() {
             {puntosFiltrados.map((p) => (
               <div
                 key={p.id}
-                className={`bg-white rounded-xl shadow-sm border p-4 ${
-                  p.activo === false ? 'border-gray-100 opacity-60' : 'border-gray-100'
-                }`}
+                className={`rounded-xl p-4 ${p.activo === false ? 'opacity-60' : ''}`}
+                style={{ background: '#161b22', border: '1px solid #30363d' }}
               >
                 <div className="flex items-start justify-between gap-2 mb-2">
-                  <h3 className="font-semibold text-gray-900 text-sm">{p.nombre}</h3>
+                  <h3 className="font-semibold text-sm" style={{ color: '#f0f6fc' }}>{p.nombre}</h3>
                   {p.activo === false && (
-                    <span className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full shrink-0">
+                    <span className="text-xs px-2 py-0.5 rounded-full shrink-0" style={{ background: '#21262d', color: '#8b949e' }}>
                       Inactivo
                     </span>
                   )}
                 </div>
-                <div className="text-xs text-gray-500 space-y-1">
+                <div className="text-xs space-y-1" style={{ color: '#8b949e' }}>
                   <p>
                     📍{' '}
                     {p.ciudad}
@@ -171,7 +172,8 @@ export default function PuntosAcopio() {
                     {p.acepta.map((cat, i) => (
                       <span
                         key={i}
-                        className="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full"
+                        className="text-xs px-2 py-0.5 rounded-full"
+                        style={{ background: '#1e3a5f', color: '#58a6ff' }}
                       >
                         {cat}
                       </span>

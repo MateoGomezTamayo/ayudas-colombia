@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import AdminLayout from '../components/AdminLayout'
-import { getEmergencias, createEmergencia, updateEmergencia } from '../api'
+import { getAdminEmergencias, createEmergencia, updateEmergencia } from '../api'
 
 const TIPO_LABELS = {
   inundacion: 'Inundación',
@@ -33,7 +33,7 @@ export default function AdminEmergencias() {
 
   const fetchEmergencias = () => {
     setLoading(true)
-    getEmergencias()
+    getAdminEmergencias()
       .then(setEmergencias)
       .catch(() => setError('Error cargando emergencias'))
       .finally(() => setLoading(false))

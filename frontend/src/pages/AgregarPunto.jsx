@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { getEmergencias, submitPuntoPublico } from '../api'
 
-const INPUT_CLASS =
-  'w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500'
+const INPUT_CLASS = 'w-full rounded-lg px-3 py-2 text-sm focus:outline-none'
+const INPUT_STYLE = { background: '#161b22', color: '#f0f6fc', border: '1px solid #30363d' }
 
 export default function AgregarPunto({ tipo = 'acopio' }) {
   const navigate = useNavigate()
@@ -56,48 +56,44 @@ export default function AgregarPunto({ tipo = 'acopio' }) {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="bg-white rounded-2xl shadow-lg p-10 max-w-md text-center">
-          <div className="text-5xl mb-4">{isAlbergue ? '🏠' : '📦'}</div>
-          <h2 className="text-2xl font-bold text-green-700 mb-2">Solicitud enviada</h2>
-          <p className="text-gray-600 mb-2">
+      <div className="min-h-screen flex items-center justify-center" style={{ background: '#0d1117' }}>
+        <div className="rounded-2xl p-10 max-w-md text-center" style={{ background: '#161b22', border: '1px solid #30363d' }}>
+          <h2 className="text-2xl font-bold mb-2" style={{ color: '#16a34a' }}>Solicitud enviada</h2>
+          <p className="mb-2" style={{ color: '#8b949e' }}>
             Tu {isAlbergue ? 'albergue' : 'punto de acopio'} fue registrado.
             El equipo lo revisara y activara pronto.
           </p>
-          <p className="text-sm text-gray-400">Redirigiendo al inicio...</p>
+          <p className="text-sm" style={{ color: '#8b949e' }}>Redirigiendo al inicio...</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen py-8" style={{ background: '#0d1117' }}>
       <div className="max-w-lg mx-auto px-4">
-        <Link to="/" className="text-blue-700 hover:text-blue-900 text-sm">← Volver al inicio</Link>
+        <Link to="/" className="text-sm" style={{ color: '#58a6ff' }}>← Volver al inicio</Link>
 
-        <div className="mt-4 mb-6 flex items-center gap-3">
-          <span className="text-3xl">{isAlbergue ? '🏠' : '📦'}</span>
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">
-              {isAlbergue ? 'Registrar Albergue' : 'Registrar Punto de Acopio'}
-            </h1>
-            <p className="text-sm text-gray-500 mt-0.5">
-              {isAlbergue
-                ? 'Reporta un lugar donde las personas pueden refugiarse'
-                : 'Reporta un lugar donde se pueden llevar donaciones'}
-            </p>
-          </div>
+        <div className="mt-4 mb-6">
+          <h1 className="text-2xl font-bold" style={{ color: '#f0f6fc' }}>
+            {isAlbergue ? 'Registrar Albergue' : 'Registrar Punto de Acopio'}
+          </h1>
+          <p className="text-sm mt-0.5" style={{ color: '#8b949e' }}>
+            {isAlbergue
+              ? 'Reporta un lugar donde las personas pueden refugiarse'
+              : 'Reporta un lugar donde se pueden llevar donaciones'}
+          </p>
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 mb-4 text-sm">{error}</div>
+          <div className="rounded-lg p-3 mb-4 text-sm" style={{ background: '#1a0a0a', border: '1px solid #dc2626', color: '#f87171' }}>{error}</div>
         )}
 
-        <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex flex-col gap-4">
+        <form onSubmit={handleSubmit} className="rounded-xl p-6 flex flex-col gap-4" style={{ background: '#161b22', border: '1px solid #30363d' }}>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Emergencia relacionada</label>
-            <select name="emergencia_id" value={form.emergencia_id} onChange={handleChange} className={INPUT_CLASS}>
+            <label className="block text-sm font-medium mb-1" style={{ color: '#8b949e' }}>Emergencia relacionada</label>
+            <select name="emergencia_id" value={form.emergencia_id} onChange={handleChange} className={INPUT_CLASS} style={INPUT_STYLE}>
               <option value="">Sin emergencia específica</option>
               {emergencias.map((em) => (
                 <option key={em.id} value={em.id}>{em.nombre}</option>
@@ -106,7 +102,7 @@ export default function AgregarPunto({ tipo = 'acopio' }) {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium mb-1" style={{ color: '#8b949e' }}>
               Nombre del {isAlbergue ? 'albergue' : 'punto'} *
             </label>
             <input
@@ -116,42 +112,43 @@ export default function AgregarPunto({ tipo = 'acopio' }) {
               required
               placeholder={isAlbergue ? 'Ej: Coliseo Municipal San José' : 'Ej: Iglesia San Pedro'}
               className={INPUT_CLASS}
+              style={INPUT_STYLE}
             />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Ciudad *</label>
-              <input name="ciudad" value={form.ciudad} onChange={handleChange} required placeholder="Ej: Cali" className={INPUT_CLASS} />
+              <label className="block text-sm font-medium mb-1" style={{ color: '#8b949e' }}>Ciudad *</label>
+              <input name="ciudad" value={form.ciudad} onChange={handleChange} required placeholder="Ej: Cali" className={INPUT_CLASS} style={INPUT_STYLE} />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Departamento</label>
-              <input name="departamento" value={form.departamento} onChange={handleChange} placeholder="Ej: Valle del Cauca" className={INPUT_CLASS} />
+              <label className="block text-sm font-medium mb-1" style={{ color: '#8b949e' }}>Departamento</label>
+              <input name="departamento" value={form.departamento} onChange={handleChange} placeholder="Ej: Valle del Cauca" className={INPUT_CLASS} style={INPUT_STYLE} />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Dirección</label>
-            <input name="direccion" value={form.direccion} onChange={handleChange} placeholder="Ej: Calle 10 # 5-32" className={INPUT_CLASS} />
+            <label className="block text-sm font-medium mb-1" style={{ color: '#8b949e' }}>Dirección</label>
+            <input name="direccion" value={form.direccion} onChange={handleChange} placeholder="Ej: Calle 10 # 5-32" className={INPUT_CLASS} style={INPUT_STYLE} />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Horario de atención</label>
-            <input name="horario" value={form.horario} onChange={handleChange} placeholder="Ej: Lunes a Sábado 8am-6pm" className={INPUT_CLASS} />
+            <label className="block text-sm font-medium mb-1" style={{ color: '#8b949e' }}>Horario de atención</label>
+            <input name="horario" value={form.horario} onChange={handleChange} placeholder="Ej: Lunes a Sábado 8am-6pm" className={INPUT_CLASS} style={INPUT_STYLE} />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
-              <input name="telefono" value={form.telefono} onChange={handleChange} placeholder="300 000 0000" className={INPUT_CLASS} />
+              <label className="block text-sm font-medium mb-1" style={{ color: '#8b949e' }}>Teléfono</label>
+              <input name="telefono" value={form.telefono} onChange={handleChange} placeholder="300 000 0000" className={INPUT_CLASS} style={INPUT_STYLE} />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Contacto / Responsable</label>
-              <input name="contacto" value={form.contacto} onChange={handleChange} placeholder="Nombre del responsable" className={INPUT_CLASS} />
+              <label className="block text-sm font-medium mb-1" style={{ color: '#8b949e' }}>Contacto / Responsable</label>
+              <input name="contacto" value={form.contacto} onChange={handleChange} placeholder="Nombre del responsable" className={INPUT_CLASS} style={INPUT_STYLE} />
             </div>
           </div>
 
-          <p className="text-xs text-gray-400 bg-gray-50 rounded-lg p-3">
+          <p className="text-xs rounded-lg p-3" style={{ color: '#8b949e', background: '#0d1117' }}>
             Tu registro sera revisado por el equipo de coordinación antes de publicarse.
           </p>
 

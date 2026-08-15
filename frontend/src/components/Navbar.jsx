@@ -5,133 +5,58 @@ import { useAuth } from '../context/AuthContext'
 export default function Navbar() {
   const { admin, logout } = useAuth()
   const navigate = useNavigate()
-  const [menuOpen, setMenuOpen] = useState(false)
+  const [open, setOpen] = useState(false)
 
-  const handleLogout = () => {
-    logout()
-    navigate('/')
-    setMenuOpen(false)
-  }
+  const handleLogout = () => { logout(); navigate('/'); setOpen(false) }
+
+  const linkStyle = { color: '#8b949e', textDecoration: 'none', fontWeight: 500, fontSize: 14 }
+  const itemStyle = { color: '#c9d1d9', textDecoration: 'none', padding: '10px 12px', borderRadius: 8, fontWeight: 500, display: 'block' }
 
   return (
-    <nav className="bg-white shadow-md sticky top-0 z-50">
-      <div className="max-w-6xl mx-auto px-4">
-        <div className="flex items-center justify-between h-14">
-          {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 font-bold text-lg select-none">
-            <span>🇨🇴</span>
-            <span className="text-blue-900">Ayudas</span>
-            <span style={{ color: '#FCD116' }}>Colombia</span>
+    <nav style={{ background: '#161b22', borderBottom: '1px solid #30363d', position: 'sticky', top: 0, zIndex: 50 }}>
+      <div style={{ maxWidth: 1152, margin: '0 auto', padding: '0 16px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 56 }}>
+          <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: 6, textDecoration: 'none' }}>
+            <span style={{ color: '#58a6ff', fontWeight: 800, fontSize: 17 }}>Ayuda</span>
+            <span style={{ color: '#FCD116', fontWeight: 800, fontSize: 17 }}>Colombia</span>
           </Link>
 
-          {/* Desktop nav */}
-          <div className="hidden md:flex items-center gap-6 text-sm">
-            <Link to="/" className="text-gray-700 hover:text-blue-900 font-medium transition-colors">
-              Inicio
-            </Link>
-            <Link to="/solicitar" className="text-gray-700 hover:text-blue-900 font-medium transition-colors">
-              Solicitar Ayuda
-            </Link>
-            <Link to="/puntos-acopio" className="text-gray-700 hover:text-blue-900 font-medium transition-colors">
-              Puntos de Acopio
-            </Link>
+          <div style={{ display: 'none', gap: 24, alignItems: 'center' }} className="md:flex">
+            <Link to="/" style={linkStyle}>Inicio</Link>
+            <Link to="/solicitar" style={linkStyle}>Solicitar Ayuda</Link>
+            <Link to="/puntos-acopio" style={linkStyle}>Puntos de Acopio</Link>
             {admin ? (
               <>
-                <Link
-                  to="/admin/dashboard"
-                  className="text-blue-800 hover:text-blue-900 font-semibold transition-colors"
-                >
-                  Panel Admin
-                </Link>
-                <button
-                  onClick={handleLogout}
-                  className="text-red-600 hover:text-red-800 font-medium transition-colors"
-                >
-                  Cerrar Sesión
-                </button>
+                <Link to="/admin/dashboard" style={{ ...linkStyle, color: '#58a6ff' }}>Panel Admin</Link>
+                <button onClick={handleLogout} style={{ color: '#f87171', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 500, fontSize: 14 }}>Cerrar Sesion</button>
               </>
             ) : (
-              <Link to="/admin" className="text-gray-400 hover:text-gray-600 text-xs transition-colors">
-                Admin
-              </Link>
+              <Link to="/admin" style={{ ...linkStyle, fontSize: 12, color: '#484f58' }}>Admin</Link>
             )}
           </div>
 
-          {/* Mobile burger */}
-          <button
-            onClick={() => setMenuOpen((o) => !o)}
-            className="md:hidden p-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors"
-            aria-label="Menú"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d={menuOpen ? 'M6 18L18 6M6 6l12 12' : 'M4 6h16M4 12h16M4 18h16'}
-              />
+          <button onClick={() => setOpen(o => !o)} className="md:hidden" style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#8b949e', padding: 8 }}>
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={open ? 'M6 18L18 6M6 6l12 12' : 'M4 6h16M4 12h16M4 18h16'} />
             </svg>
           </button>
         </div>
 
-        {/* Mobile menu */}
-        {menuOpen && (
-          <div className="md:hidden py-3 border-t border-gray-100 flex flex-col gap-1 text-sm">
-            <Link
-              to="/"
-              onClick={() => setMenuOpen(false)}
-              className="text-gray-700 font-medium px-2 py-2 rounded-lg hover:bg-gray-50"
-            >
-              Inicio
-            </Link>
-            <Link
-              to="/solicitar"
-              onClick={() => setMenuOpen(false)}
-              className="text-gray-700 font-medium px-2 py-2 rounded-lg hover:bg-gray-50"
-            >
-              Solicitar Ayuda
-            </Link>
-            <Link
-              to="/puntos-acopio"
-              onClick={() => setMenuOpen(false)}
-              className="text-gray-700 font-medium px-2 py-2 rounded-lg hover:bg-gray-50"
-            >
-              Puntos de Acopio
-            </Link>
+        {open && (
+          <div style={{ borderTop: '1px solid #30363d', paddingTop: 8, paddingBottom: 12 }}>
+            {[['/', 'Inicio'], ['/solicitar', 'Solicitar Ayuda'], ['/puntos-acopio', 'Puntos de Acopio']].map(([to, label]) => (
+              <Link key={to} to={to} onClick={() => setOpen(false)} style={itemStyle}>{label}</Link>
+            ))}
             {admin ? (
               <>
-                <Link
-                  to="/admin/dashboard"
-                  onClick={() => setMenuOpen(false)}
-                  className="text-blue-800 font-semibold px-2 py-2 rounded-lg hover:bg-blue-50"
-                >
-                  Panel Admin
-                </Link>
-                <button
-                  onClick={handleLogout}
-                  className="text-red-600 font-medium px-2 py-2 rounded-lg hover:bg-red-50 text-left"
-                >
-                  Cerrar Sesión
-                </button>
+                <Link to="/admin/dashboard" onClick={() => setOpen(false)} style={{ ...itemStyle, color: '#58a6ff' }}>Panel Admin</Link>
+                <button onClick={handleLogout} style={{ color: '#f87171', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', padding: '10px 12px', fontWeight: 500, width: '100%' }}>Cerrar Sesion</button>
               </>
             ) : (
-              <Link
-                to="/admin"
-                onClick={() => setMenuOpen(false)}
-                className="text-gray-400 text-xs px-2 py-2"
-              >
-                Admin
-              </Link>
+              <Link to="/admin" onClick={() => setOpen(false)} style={{ ...itemStyle, fontSize: 12, color: '#484f58' }}>Admin</Link>
             )}
           </div>
         )}
-      </div>
-
-      {/* Colombian flag stripe */}
-      <div className="flex h-1">
-        <div className="flex-1" style={{ background: '#FCD116' }} />
-        <div className="flex-1" style={{ background: '#003893' }} />
-        <div className="flex-1" style={{ background: '#CE1126' }} />
       </div>
     </nav>
   )

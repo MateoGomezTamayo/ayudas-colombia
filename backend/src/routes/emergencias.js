@@ -6,9 +6,13 @@
 const router = require('express').Router();
 const db = require('../db');
 
-router.get('/', async (_req, res) => {
+router.get('/', async (req, res) => {
+  const { all } = req.query
   try {
-    const { rows } = await db.query('SELECT * FROM emergencias ORDER BY created_at DESC');
+    const query = all
+      ? 'SELECT * FROM emergencias ORDER BY created_at DESC'
+      : "SELECT * FROM emergencias WHERE estado = 'activa' ORDER BY created_at DESC"
+    const { rows } = await db.query(query);
     res.json(rows);
   } catch (err) {
     console.error('GET /emergencias:', err.message);

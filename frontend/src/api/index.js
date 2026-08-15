@@ -53,8 +53,9 @@ export const deletePunto = (id) =>
 export const createEmergencia = (data) =>
   api.post('/admin/emergencias', data).then((r) => r.data)
 
-export const updateEmergencia = (id, data) =>
-  api.patch(`/admin/emergencias/${id}`, data).then((r) => r.data)
+// Admin version returns ALL (including cerradas)
+export const getAdminEmergencias = () =>
+  api.get('/emergencias', { params: { all: 1 } }).then((r) => r.data)
 
 export const getAdminSolicitudes = (params) =>
   api.get('/solicitudes', { params }).then((r) => r.data)

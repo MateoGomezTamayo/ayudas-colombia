@@ -14,8 +14,8 @@ const CATEGORIAS = [
   { id: 8, nombre: 'Otro' },
 ]
 
-const INPUT_CLASS =
-  'w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500'
+const INPUT_CLASS = 'w-full rounded-lg px-3 py-2 text-sm focus:outline-none'
+const INPUT_STYLE = { background: '#161b22', color: '#f0f6fc', border: '1px solid #30363d' }
 
 export default function SolicitarAyuda() {
   const navigate = useNavigate()
@@ -101,34 +101,33 @@ export default function SolicitarAyuda() {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="bg-white rounded-2xl shadow-lg p-10 max-w-md text-center">
-          <div className="text-5xl mb-4">✅</div>
-          <h2 className="text-2xl font-bold text-green-700 mb-2">¡Solicitud enviada!</h2>
-          <p className="text-gray-600 mb-4">
+      <div className="min-h-screen flex items-center justify-center" style={{ background: '#0d1117' }}>
+        <div className="rounded-2xl p-10 max-w-md text-center" style={{ background: '#161b22', border: '1px solid #30363d' }}>
+          <h2 className="text-2xl font-bold mb-2" style={{ color: '#16a34a' }}>Solicitud enviada</h2>
+          <p className="mb-4" style={{ color: '#8b949e' }}>
             Tu solicitud de ayuda ha sido registrada. El equipo de coordinación la revisará pronto.
           </p>
-          <p className="text-sm text-gray-400">Redirigiendo al inicio...</p>
+          <p className="text-sm" style={{ color: '#8b949e' }}>Redirigiendo al inicio...</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen py-8" style={{ background: '#0d1117' }}>
       <div className="max-w-5xl mx-auto px-4">
         <div className="mb-6">
-          <Link to="/" className="text-blue-700 hover:text-blue-900 text-sm">
+          <Link to="/" className="text-sm" style={{ color: '#58a6ff' }}>
             ← Volver al inicio
           </Link>
-          <h1 className="text-2xl font-bold text-gray-900 mt-2">Solicitar Ayuda</h1>
-          <p className="text-gray-500 text-sm mt-1">
+          <h1 className="text-2xl font-bold mt-2" style={{ color: '#f0f6fc' }}>Solicitar Ayuda</h1>
+          <p className="text-sm mt-1" style={{ color: '#8b949e' }}>
             Completa el formulario para registrar tu solicitud de ayuda humanitaria
           </p>
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 mb-4 text-sm">
+          <div className="rounded-lg p-3 mb-4 text-sm" style={{ background: '#1a0a0a', border: '1px solid #dc2626', color: '#f87171' }}>
             {error}
           </div>
         )}
@@ -136,11 +135,11 @@ export default function SolicitarAyuda() {
         <form onSubmit={handleSubmit}>
           <div className="grid md:grid-cols-2 gap-6">
             {/* ── Left column ── */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 flex flex-col gap-4">
-              <h2 className="font-semibold text-gray-800 border-b pb-2">Información básica</h2>
+            <div className="rounded-xl p-5 flex flex-col gap-4" style={{ background: '#161b22', border: '1px solid #30363d' }}>
+              <h2 className="font-semibold pb-2" style={{ color: '#f0f6fc', borderBottom: '1px solid #30363d' }}>Información básica</h2>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium mb-1" style={{ color: '#8b949e' }}>
                   Emergencia *
                 </label>
                 <select
@@ -149,6 +148,7 @@ export default function SolicitarAyuda() {
                   onChange={handleChange}
                   required
                   className={INPUT_CLASS}
+                  style={INPUT_STYLE}
                 >
                   {emergencias.length === 0 && (
                     <option value="">Sin emergencias activas</option>
@@ -163,7 +163,7 @@ export default function SolicitarAyuda() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium mb-1" style={{ color: '#8b949e' }}>
                     Ciudad *
                   </label>
                   <input
@@ -173,10 +173,11 @@ export default function SolicitarAyuda() {
                     required
                     placeholder="Ej: Medellín"
                     className={INPUT_CLASS}
+                    style={INPUT_STYLE}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium mb-1" style={{ color: '#8b949e' }}>
                     Departamento
                   </label>
                   <input
@@ -185,12 +186,13 @@ export default function SolicitarAyuda() {
                     onChange={handleChange}
                     placeholder="Ej: Antioquia"
                     className={INPUT_CLASS}
+                    style={INPUT_STYLE}
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium mb-1" style={{ color: '#8b949e' }}>
                   Direccion
                 </label>
                 <input
@@ -199,11 +201,12 @@ export default function SolicitarAyuda() {
                   onChange={handleChange}
                   placeholder="Ej: Calle 10 # 5-32, Barrio La Esperanza"
                   className={INPUT_CLASS}
+                  style={INPUT_STYLE}
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium mb-1" style={{ color: '#8b949e' }}>
                   Nombre del solicitante
                 </label>
                 <input
@@ -212,11 +215,12 @@ export default function SolicitarAyuda() {
                   onChange={handleChange}
                   placeholder="Tu nombre completo"
                   className={INPUT_CLASS}
+                  style={INPUT_STYLE}
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium mb-1" style={{ color: '#8b949e' }}>
                   Teléfono / Contacto
                 </label>
                 <input
@@ -225,11 +229,12 @@ export default function SolicitarAyuda() {
                   onChange={handleChange}
                   placeholder="300 000 0000"
                   className={INPUT_CLASS}
+                  style={INPUT_STYLE}
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium mb-1" style={{ color: '#8b949e' }}>
                   Descripción
                 </label>
                 <textarea
@@ -239,11 +244,12 @@ export default function SolicitarAyuda() {
                   rows={3}
                   placeholder="Describe la situación y la ayuda que necesitas..."
                   className={`${INPUT_CLASS} resize-none`}
+                  style={INPUT_STYLE}
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium mb-1" style={{ color: '#8b949e' }}>
                   Prioridad
                 </label>
                 <select
@@ -251,6 +257,7 @@ export default function SolicitarAyuda() {
                   value={form.prioridad}
                   onChange={handleChange}
                   className={INPUT_CLASS}
+                  style={INPUT_STYLE}
                 >
                   <option value="alta">Alta — Urgente</option>
                   <option value="media">Media</option>
@@ -260,17 +267,18 @@ export default function SolicitarAyuda() {
             </div>
 
             {/* ── Right column ── */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 flex flex-col gap-4">
-              <h2 className="font-semibold text-gray-800 border-b pb-2">Productos necesarios</h2>
+            <div className="rounded-xl p-5 flex flex-col gap-4" style={{ background: '#161b22', border: '1px solid #30363d' }}>
+              <h2 className="font-semibold pb-2" style={{ color: '#f0f6fc', borderBottom: '1px solid #30363d' }}>Productos necesarios</h2>
 
               <div className="flex flex-col gap-3">
                 {items.map((item, index) => (
                   <div
                     key={index}
-                    className="border border-gray-200 rounded-lg p-3 bg-gray-50 flex flex-col gap-2"
+                    className="rounded-lg p-3 flex flex-col gap-2"
+                    style={{ background: '#0d1117', border: '1px solid #30363d' }}
                   >
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-medium text-gray-500">
+                      <span className="text-xs font-medium" style={{ color: '#8b949e' }}>
                         Producto {index + 1}
                       </span>
                       {items.length > 1 && (
@@ -288,7 +296,8 @@ export default function SolicitarAyuda() {
                     <select
                       value={item.categoria_id}
                       onChange={(e) => handleItemChange(index, 'categoria_id', e.target.value)}
-                      className={`${INPUT_CLASS} bg-white`}
+                      className={INPUT_CLASS}
+                      style={INPUT_STYLE}
                     >
                       {CATEGORIAS.map((c) => (
                         <option key={c.id} value={c.id}>
@@ -303,6 +312,7 @@ export default function SolicitarAyuda() {
                       placeholder="Nombre del producto"
                       required
                       className={INPUT_CLASS}
+                      style={INPUT_STYLE}
                     />
 
                     <div className="grid grid-cols-2 gap-2">
@@ -314,12 +324,14 @@ export default function SolicitarAyuda() {
                         min="1"
                         required
                         className={INPUT_CLASS}
+                        style={INPUT_STYLE}
                       />
                       <input
                         value={item.unidad}
                         onChange={(e) => handleItemChange(index, 'unidad', e.target.value)}
                         placeholder="Unidad (kg, L, pzs…)"
                         className={INPUT_CLASS}
+                        style={INPUT_STYLE}
                       />
                     </div>
                   </div>
@@ -329,16 +341,18 @@ export default function SolicitarAyuda() {
               <button
                 type="button"
                 onClick={addItem}
-                className="border-2 border-dashed border-blue-300 text-blue-600 hover:border-blue-500 hover:bg-blue-50 rounded-lg py-2.5 text-sm font-medium transition-colors"
+                className="rounded-lg py-2.5 text-sm font-medium transition-colors"
+                style={{ border: '2px dashed #30363d', color: '#58a6ff' }}
               >
                 + Agregar producto
               </button>
 
-              <div className="mt-auto pt-4 border-t border-gray-100">
+              <div className="mt-auto pt-4" style={{ borderTop: '1px solid #30363d' }}>
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full bg-green-600 hover:bg-green-700 disabled:opacity-60 text-white font-semibold py-3 rounded-xl transition-colors text-sm"
+                  className="w-full disabled:opacity-60 text-white font-semibold py-3 rounded-xl transition-colors text-sm"
+                  style={{ background: '#16a34a' }}
                 >
                   {loading ? 'Enviando...' : 'Enviar Solicitud'}
                 </button>
