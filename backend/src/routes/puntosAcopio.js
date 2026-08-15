@@ -19,7 +19,7 @@ router.get('/', async (req, res) => {
 
   try {
     const { rows } = await db.query(
-      `SELECT * FROM puntos_acopio p WHERE ${conditions.join(' AND ')} ORDER BY created_at DESC`,
+      `SELECT * FROM puntos_acopio p WHERE ${conditions.join(' AND ')} ORDER BY created_at DESC LIMIT 100`,
       params
     );
     res.json(rows);

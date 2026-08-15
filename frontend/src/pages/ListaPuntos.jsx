@@ -133,9 +133,53 @@ export default function ListaPuntos({ tipo = 'acopio' }) {
                       <a href={`tel:${p.telefono}`} style={{ color: '#58a6ff', textDecoration: 'none', fontWeight: 500 }}>{p.telefono}</a>
                     </div>
                   )}
-                  {p.contacto && (
+                  {p.contacto && p.contacto.startsWith('http') ? null : p.contacto && (
                     <div style={{ fontSize: 12, color: muted }}>Contacto: {p.contacto}</div>
                   )}
+
+                  {/* Navigation buttons */}
+                  <div style={{ display: 'flex', gap: 8, marginTop: 10, paddingTop: 10, borderTop: `1px solid ${border}` }}>
+                    <a
+                      href={p.lat && p.lng
+                        ? `https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lng}`
+                        : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((p.direccion || '') + ' ' + p.ciudad)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ flex: 1, background: '#1a56db', color: 'white', textDecoration: 'none', borderRadius: 10, padding: '8px 10px', fontSize: 12, fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5 }}
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                      </svg>
+                      Google Maps
+                    </a>
+                    <a
+                      href={p.lat && p.lng
+                        ? `https://waze.com/ul?ll=${p.lat},${p.lng}&navigate=yes`
+                        : `https://waze.com/ul?q=${encodeURIComponent((p.direccion || '') + ' ' + p.ciudad)}&navigate=yes`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ flex: 1, background: '#00d1ff20', color: '#00d1ff', border: '1px solid #00d1ff40', textDecoration: 'none', borderRadius: 10, padding: '8px 10px', fontSize: 12, fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5 }}
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/>
+                      </svg>
+                      Waze
+                    </a>
+                    {p.contacto && p.contacto.startsWith('http') && (
+                      <a
+                        href={p.contacto}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ flex: 1, background: '#16a34a20', color: '#4ade80', border: '1px solid #16a34a40', textDecoration: 'none', borderRadius: 10, padding: '8px 10px', fontSize: 12, fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5 }}
+                      >
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413z"/>
+                          <path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.553 4.117 1.522 5.847L.057 23.143a.5.5 0 0 0 .6.6l5.297-1.465A11.95 11.95 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.891 0-3.67-.523-5.186-1.432l-.369-.219-3.843 1.063 1.024-3.75-.24-.386A9.96 9.96 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/>
+                        </svg>
+                        WhatsApp
+                      </a>
+                    )}
+                  </div>
                 </div>
               </div>
             ))}
