@@ -108,6 +108,199 @@ async function seed() {
     );
 
     console.log('✓ 2 puntos de acopio de ejemplo insertados');
+
+    // 5. Nueva emergencia — Crisis humanitaria nacional (puntos Bogotá)
+    const { rows: [emergBog] } = await client.query(
+      `INSERT INTO emergencias (nombre, descripcion, tipo, estado, departamento, municipio, fecha_inicio)
+       VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
+      [
+        'Crisis Humanitaria Nacional 2026 - Puntos Bogotá',
+        'Puntos de acopio activos en Bogotá para enviar ayuda humanitaria a comunidades afectadas en Chocó, Buenaventura y otras zonas del país. Fuente: hoja colaborativa en tiempo real.',
+        'Otro',
+        'activa',
+        'Cundinamarca',
+        'Bogotá',
+        '2026-08-14'
+      ]
+    );
+    const emergBogId = emergBog.id;
+    console.log(`✓ Emergencia Bogotá insertada (id: ${emergBogId})`);
+
+    // 6. Puntos de acopio Bogotá (fuente: VOLUNTARIADO Y DONACIONES EN TIEMPO REAL BOGOTÁ)
+    const puntosBogota = [
+      {
+        nombre: 'Unicentro',
+        dir: 'Carrera 15 #124-30', lat: 4.7007, lng: -74.0431,
+        horario: '9am - 6pm', contacto: null, tel: null,
+        items: ['Alimentos', 'Medicamentos', 'Higiene', 'Ropa y Abrigo']
+      },
+      {
+        nombre: 'Vive Claro',
+        dir: 'Carrera 60 #42-41', lat: 4.6318, lng: -74.1064,
+        horario: null, contacto: null, tel: null,
+        items: ['Medicamentos', 'Higiene']
+      },
+      {
+        nombre: 'Estadio El Campín',
+        dir: 'NQS con Calle 57', lat: 4.6471, lng: -74.0975,
+        horario: 'Hasta las 8pm', contacto: null, tel: null,
+        items: ['Alimentos', 'Higiene', 'Colchonetas y Cobijas', 'Ropa y Abrigo']
+      },
+      {
+        nombre: 'C.C. Nuestro Bogotá',
+        dir: 'Carrera 86 #55A-75', lat: 4.6399, lng: -74.1253,
+        horario: null, contacto: null, tel: null,
+        items: ['Alimentos', 'Medicamentos', 'Higiene']
+      },
+      {
+        nombre: 'Compensar Carrera 60',
+        dir: 'Carrera 60 #66B-05', lat: 4.6565, lng: -74.1066,
+        horario: null, contacto: null, tel: null,
+        items: ['Alimentos', 'Higiene', 'Colchonetas y Cobijas', 'Otro']
+      },
+      {
+        nombre: 'Universidad Distrital Bosa',
+        dir: 'Calle 52 Sur #93D-97', lat: 4.5698, lng: -74.1704,
+        horario: null, contacto: null, tel: null,
+        items: ['Alimentos', 'Higiene']
+      },
+      {
+        nombre: 'The Spot Park',
+        dir: 'Carrera 13A #37-68', lat: 4.6233, lng: -74.0637,
+        horario: null, contacto: null, tel: null,
+        items: ['Alimentos', 'Higiene']
+      },
+      {
+        nombre: 'Galería Aborigen',
+        dir: 'Carrera 6A #116-17', lat: 4.7031, lng: -74.0487,
+        horario: 'Hasta las 10pm', contacto: null, tel: null,
+        items: ['Alimentos', 'Ropa y Abrigo', 'Otro']
+      },
+      {
+        nombre: 'Universidad Cooperativa',
+        dir: 'Carrera 9 #172-90', lat: 4.7497, lng: -74.0504,
+        horario: null, contacto: null, tel: null,
+        items: ['Alimentos', 'Higiene']
+      },
+      {
+        nombre: 'Punto Carrera 13A #101-74',
+        dir: 'Carrera 13A #101-74 Apto 404', lat: 4.6932, lng: -74.0638,
+        horario: null, contacto: null, tel: null,
+        items: ['Medicamentos']
+      },
+      {
+        nombre: 'Punto Carrera 14B #106-75',
+        dir: 'Carrera 14B #106-75', lat: 4.6952, lng: -74.0635,
+        horario: null, contacto: null, tel: null,
+        items: ['Alimentos', 'Higiene', 'Otro']
+      },
+      {
+        nombre: 'Punto Calle 14 #19-64',
+        dir: 'Calle 14 #19-64', lat: 4.5966, lng: -74.0726,
+        horario: null, contacto: null, tel: null,
+        items: ['Alimentos', 'Higiene']
+      },
+      {
+        nombre: 'Uniagraria',
+        dir: 'Calle 170 #54A-10, Sala de Juntas Bloque C', lat: 4.7682, lng: -74.1030,
+        horario: null, contacto: null, tel: null,
+        items: ['Higiene', 'Colchonetas y Cobijas', 'Otro']
+      },
+      {
+        nombre: 'JAC Pastranita - Kennedy',
+        dir: 'Carrera 80a #49-08, Barrio Calarcá', lat: 4.6292, lng: -74.1420,
+        horario: '10am - 7pm (sábado y domingo)', contacto: null, tel: null,
+        items: ['Alimentos', 'Higiene', 'Medicamentos', 'Ropa y Abrigo']
+      },
+      {
+        nombre: 'Palacio de los Deportes',
+        dir: 'Calle 63 #59A-06', lat: 4.6553, lng: -74.1048,
+        horario: 'Hasta las 10pm', contacto: null, tel: null,
+        items: ['Alimentos', 'Ropa y Abrigo', 'Otro']
+      },
+      {
+        nombre: 'Cantón de Caballería',
+        dir: 'Carrera 7 #106-10', lat: 4.6960, lng: -74.0463,
+        horario: null, contacto: 'Nicolás Pinzon', tel: '3115380066',
+        items: ['Medicamentos', 'Alimentos', 'Colchonetas y Cobijas']
+      },
+      {
+        nombre: 'Punto Calle 116 #71A-49',
+        dir: 'Calle 116 #71A-49', lat: 4.7031, lng: -74.1136,
+        horario: null, contacto: null, tel: null,
+        items: ['Alimentos', 'Medicamentos', 'Colchonetas y Cobijas']
+      },
+      {
+        nombre: 'Punto Calle 94A #11-27',
+        dir: 'Calle 94a #11-27 Of. 204', lat: 4.6787, lng: -74.0481,
+        horario: null, contacto: null, tel: null,
+        items: ['Alimentos', 'Medicamentos', 'Colchonetas y Cobijas']
+      },
+      {
+        nombre: 'La Campiña - Suba',
+        dir: 'Calle 140B #96-60', lat: 4.7413, lng: -74.1279,
+        horario: null, contacto: '@estebansldanas (IG)', tel: null,
+        items: ['Alimentos', 'Otro']
+      },
+      {
+        nombre: 'Carulla 85 - somos.70veces7',
+        dir: 'Autopista 85 #15-23', lat: 4.6727, lng: -74.0481,
+        horario: null, contacto: null, tel: null,
+        items: ['Medicamentos', 'Higiene', 'Alimentos', 'Ropa y Abrigo']
+      },
+      {
+        nombre: 'Casa PCN',
+        dir: 'Calle 12d #1a-10', lat: 4.5985, lng: -74.0775,
+        horario: '9am - 6pm', contacto: 'PCN Bogotá (@PCN_Bogota)', tel: null,
+        items: ['Medicamentos', 'Higiene', 'Alimentos']
+      },
+      {
+        nombre: '122 Plaza Apartahotel',
+        dir: 'Carrera 15a #122-27', lat: 4.7003, lng: -74.0417,
+        horario: '24 horas', contacto: null, tel: null,
+        items: ['Alimentos', 'Agua', 'Higiene', 'Medicamentos', 'Colchonetas y Cobijas']
+      },
+      {
+        nombre: 'SOS Juntos por el Chocó',
+        dir: 'Calle 38 #29-29', lat: 4.6178, lng: -74.0893,
+        horario: null, contacto: 'IG: PCN_Bogota', tel: null,
+        items: ['Alimentos', 'Higiene', 'Medicamentos']
+      },
+      {
+        nombre: 'Parque de los Hippies',
+        dir: 'Autopista 63 #59A-06', lat: 4.6519, lng: -74.1050,
+        horario: 'Desde 1pm', contacto: null, tel: null,
+        items: ['Alimentos', 'Higiene', 'Ropa y Abrigo', 'Otro']
+      },
+      {
+        nombre: 'Escuela de Caballería',
+        dir: 'Carrera 7 #106-10', lat: 4.6960, lng: -74.0463,
+        horario: 'Hasta las 8pm', contacto: null, tel: null,
+        items: ['Alimentos', 'Otro']
+      },
+      {
+        nombre: 'Casa de la Memoria Usaquén',
+        dir: 'Calle 161a #7F-55', lat: 4.7530, lng: -74.0430,
+        horario: null, contacto: null, tel: null,
+        items: ['Alimentos', 'Higiene', 'Medicamentos', 'Colchonetas y Cobijas', 'Herramientas']
+      },
+      {
+        nombre: 'C.C. Multiplaza',
+        dir: 'Calle 19A #72-57', lat: 4.6047, lng: -74.1128,
+        horario: '2pm - 9pm', contacto: null, tel: null,
+        items: ['Alimentos', 'Higiene', 'Medicamentos']
+      }
+    ];
+
+    for (const p of puntosBogota) {
+      await client.query(
+        `INSERT INTO puntos_acopio (nombre, ciudad, departamento, direccion, lat, lng, horario, contacto, telefono, que_acepta, emergencia_id)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)`,
+        [p.nombre, 'Bogotá', 'Cundinamarca', p.dir, p.lat, p.lng, p.horario, p.contacto, p.tel, p.items, emergBogId]
+      );
+    }
+    console.log(`✓ ${puntosBogota.length} puntos de acopio Bogotá insertados`);
+
     console.log('\n✅ Seed completado exitosamente');
   } catch (err) {
     console.error('❌ Error en seed:', err.message);

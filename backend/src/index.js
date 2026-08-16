@@ -17,6 +17,7 @@ app.use('/api/puntos-acopio', cache30, require('./routes/puntosAcopio'));
 app.use('/api/solicitudes', cache30, require('./routes/solicitudes'));
 app.use('/api/voluntarios', cache30, require('./routes/voluntarios'));
 app.use('/api/auth', require('./routes/auth'));
+app.use('/api/admin/voluntarios', require('./routes/adminVoluntarios'));
 app.use('/api/admin/solicitudes', require('./routes/adminSolicitudes'));
 app.use('/api/admin/puntos-acopio', require('./routes/adminPuntos'));
 app.use('/api/admin/emergencias', require('./routes/adminEmergencias'));

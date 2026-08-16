@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { getPuntosAcopio, getEmergencias } from '../api'
@@ -13,6 +13,17 @@ L.Icon.Default.mergeOptions({
   shadowUrl:
     'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
 })
+
+function MapAutoFit({ puntos }) {
+  const map = useMap()
+  useEffect(() => {
+    const pts = puntos.filter(p => p.lat && p.lng)
+    if (!pts.length) return
+    if (pts.length === 1) { map.setView([pts[0].lat, pts[0].lng], 13); return }
+    map.fitBounds(pts.map(p => [p.lat, p.lng]), { padding: [40, 40] })
+  }, [map, puntos])
+  return null
+}
 
 function createPuntoIcon() {
   return L.divIcon({
@@ -105,11 +116,12 @@ export default function PuntosAcopio() {
 
         {/* Map */}
         <div className="rounded-xl overflow-hidden mb-5" style={{ border: '1px solid #30363d' }}>
-          <MapContainer center={[4.5, -74.0]} zoom={6} style={{ height: '360px' }}>
+          <MapContainer center={[4.6, -74.1]} zoom={6} style={{ height: '360px' }}>
             <TileLayer
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
+            <MapAutoFit puntos={puntosFiltrados} />
             {puntosFiltrados
               .filter((p) => p.lat && p.lng)
               .map((p) => (
@@ -167,9 +179,9 @@ export default function PuntosAcopio() {
                   {p.telefono && <p>📞 {p.telefono}</p>}
                   {p.contacto && <p>👤 {p.contacto}</p>}
                 </div>
-                {p.acepta?.length > 0 && (
+                {p.que_acepta?.length > 0 && (
                   <div className="mt-3 flex flex-wrap gap-1">
-                    {p.acepta.map((cat, i) => (
+                    {p.que_acepta.map((cat, i) => (
                       <span
                         key={i}
                         className="text-xs px-2 py-0.5 rounded-full"

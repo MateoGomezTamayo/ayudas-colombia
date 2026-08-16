@@ -82,7 +82,24 @@ export default function Voluntariado() {
         <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#22c55e', flexShrink: 0 }} />
         <div>
           <div style={{ fontSize: 13, fontWeight: 600, color: text }}>Hoja en tiempo real - Bogota</div>
-          <div style={{ fontSize: 11, color: muted, marginTop: 2 }}>60+ puntos de voluntariado actualizados en vivo</div>
+          <div style={{ fontSize: 11, color: muted, marginTop: 2 }}>27+ puntos de donaciones en Bogotá activos</div>
+        </div>
+        <svg style={{ marginLeft: 'auto', flexShrink: 0 }} width="16" height="16" viewBox="0 0 24 24" fill={muted}>
+          <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
+        </svg>
+      </a>
+
+      {/* Donar en línea */}
+      <a
+        href="https://colombiateamo.com/"
+        target="_blank"
+        rel="noopener noreferrer"
+        style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '10px 18px 0', background: '#16a34a15', border: '1px solid #16a34a40', borderRadius: 12, padding: '12px 14px', textDecoration: 'none' }}
+      >
+        <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#4ade80', flexShrink: 0 }} />
+        <div>
+          <div style={{ fontSize: 13, fontWeight: 600, color: '#4ade80' }}>Donar en línea</div>
+          <div style={{ fontSize: 11, color: muted, marginTop: 2 }}>colombiateamo.com — donaciones digitales</div>
         </div>
         <svg style={{ marginLeft: 'auto', flexShrink: 0 }} width="16" height="16" viewBox="0 0 24 24" fill={muted}>
           <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
@@ -93,6 +110,19 @@ export default function Voluntariado() {
       <div style={{ padding: '14px 18px 0' }}>
         {loading ? (
           <div style={{ textAlign: 'center', padding: '40px 0', color: muted }}>Cargando...</div>
+        ) : filtrado.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '40px 0' }}>
+            <div style={{ fontSize: 36, marginBottom: 10 }}>🙌</div>
+            <p style={{ color: muted, fontSize: 14, marginBottom: 16 }}>No hay oportunidades registradas aún.</p>
+            <a
+              href="https://docs.google.com/spreadsheets/d/1-hMGwC0XaSu5ddZ896gYyVRpmbPkVYg3NJ_6rSxK4Y8/htmlview"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ background: '#1d4ed8', color: 'white', textDecoration: 'none', borderRadius: 12, padding: '10px 20px', fontSize: 13, fontWeight: 600 }}
+            >
+              Ver hoja en tiempo real →
+            </a>
+          </div>
         ) : filtrado.map(v => {
           const t = TIPO_STYLE[v.tipo] || TIPO_STYLE.presencial
           return (

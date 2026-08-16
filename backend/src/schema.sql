@@ -67,6 +67,26 @@ CREATE TABLE IF NOT EXISTS puntos_acopio (
   telefono VARCHAR(50),
   que_acepta TEXT[],
   activo BOOLEAN DEFAULT TRUE,
+  tipo VARCHAR(50) DEFAULT 'acopio',
+  emergencia_id INTEGER REFERENCES emergencias(id),
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Migration-safe: add tipo if the table already exists in production
+ALTER TABLE puntos_acopio ADD COLUMN IF NOT EXISTS tipo VARCHAR(50) DEFAULT 'acopio';
+
+CREATE TABLE IF NOT EXISTS voluntarios (
+  id SERIAL PRIMARY KEY,
+  nombre VARCHAR(255) NOT NULL,
+  ciudad VARCHAR(255),
+  tipo VARCHAR(50) DEFAULT 'presencial',
+  descripcion TEXT,
+  link_inscripcion TEXT,
+  whatsapp TEXT,
+  instagram VARCHAR(255),
+  telefono VARCHAR(50),
+  activo BOOLEAN DEFAULT TRUE,
   emergencia_id INTEGER REFERENCES emergencias(id),
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP DEFAULT NOW()

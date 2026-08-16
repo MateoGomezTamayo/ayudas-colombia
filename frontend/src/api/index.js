@@ -66,4 +66,16 @@ export const getAdminSolicitudes = (params) =>
 export const getAdminPuntos = () =>
   api.get('/puntos-acopio').then((r) => r.data)
 
+export const getAdminVoluntarios = () =>
+  api.get('/admin/voluntarios').then((r) => r.data)
+
+export const createVoluntario = (data) =>
+  api.post('/admin/voluntarios', data).then((r) => r.data)
+
+export const updateVoluntario = (id, data) =>
+  api.patch(`/admin/voluntarios/${id}`, data).then((r) => r.data)
+
+export const deleteVoluntario = (id) =>
+  api.delete(`/admin/voluntarios/${id}`).then((r) => r.data)
+
 export default api

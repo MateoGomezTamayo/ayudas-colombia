@@ -131,7 +131,7 @@ export default function Ayudas() {
           <div>
             <h1 style={{ fontSize: 22, fontWeight: 800, margin: 0 }}>Ayudas</h1>
             <p style={{ fontSize: 12, color: muted, marginTop: 4, marginBottom: 0 }}>
-              {emergencias[0]?.nombre || 'Solicitudes activas'}
+              {filtered.length} solicitudes activas
             </p>
           </div>
           <Link
@@ -141,6 +141,54 @@ export default function Ayudas() {
             + Pedir ayuda
           </Link>
         </div>
+
+        {/* Emergency notification cards */}
+        {emergencias.length > 0 && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 14 }}>
+            {emergencias.map(em => {
+              const isSelected = emergenciaId === String(em.id)
+              return (
+                <button
+                  key={em.id}
+                  onClick={() => setEmergenciaId(isSelected ? '' : String(em.id))}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 10,
+                    background: isSelected ? 'rgba(220,38,38,0.12)' : 'rgba(220,38,38,0.05)',
+                    border: `1px solid ${isSelected ? 'rgba(220,38,38,0.5)' : 'rgba(220,38,38,0.2)'}`,
+                    borderRadius: 10, padding: '9px 12px',
+                    cursor: 'pointer', textAlign: 'left', width: '100%',
+                  }}
+                >
+                  {/* Pulsing dot */}
+                  <div style={{ position: 'relative', flexShrink: 0 }}>
+                    <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#ef4444' }} />
+                    <div style={{
+                      position: 'absolute', inset: -3,
+                      borderRadius: '50%', border: '2px solid #ef4444',
+                      animation: 'pulse-ring 1.5s ease-out infinite',
+                      opacity: isSelected ? 1 : 0.6,
+                    }} />
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: '#fca5a5', lineHeight: 1.2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      {em.nombre}
+                    </div>
+                    <div style={{ fontSize: 10, color: muted, marginTop: 2 }}>
+                      {[em.tipo, em.departamento, em.municipio].filter(Boolean).join(' · ')}
+                    </div>
+                  </div>
+                  <span style={{
+                    fontSize: 9, fontWeight: 700, padding: '2px 7px', borderRadius: 20, flexShrink: 0,
+                    background: isSelected ? '#dc2626' : 'rgba(220,38,38,0.2)',
+                    color: isSelected ? 'white' : '#f87171',
+                  }}>
+                    {isSelected ? 'ACTIVA ✓' : 'ACTIVA'}
+                  </span>
+                </button>
+              )
+            })}
+          </div>
+        )}
 
         {/* Tabs */}
         <div style={{ display: 'flex', gap: 0, marginBottom: -1 }}>

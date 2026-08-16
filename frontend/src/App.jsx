@@ -14,6 +14,7 @@ import AdminDashboard from './pages/AdminDashboard'
 import AdminSolicitudes from './pages/AdminSolicitudes'
 import AdminPuntos from './pages/AdminPuntos'
 import AdminEmergencias from './pages/AdminEmergencias'
+import AdminVoluntariado from './pages/AdminVoluntariado'
 
 export default function App() {
   const { pathname } = useLocation()
@@ -36,6 +37,7 @@ export default function App() {
         <Route path="/admin/solicitudes" element={<ProtectedRoute><AdminSolicitudes /></ProtectedRoute>} />
         <Route path="/admin/puntos" element={<ProtectedRoute><AdminPuntos /></ProtectedRoute>} />
         <Route path="/admin/emergencias" element={<ProtectedRoute><AdminEmergencias /></ProtectedRoute>} />
+        <Route path="/admin/voluntariado" element={<ProtectedRoute><AdminVoluntariado /></ProtectedRoute>} />
       </Routes>
       <BottomNav />
     </>

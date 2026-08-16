@@ -23,7 +23,7 @@ const EMPTY_FORM = {
   horario: '',
   contacto: '',
   telefono: '',
-  acepta: [],
+  que_acepta: [],
   activo: true,
   tipo: 'acopio',
 }
@@ -70,7 +70,7 @@ export default function AdminPuntos() {
       horario: punto.horario || '',
       contacto: punto.contacto || '',
       telefono: punto.telefono || '',
-      acepta: punto.acepta || [],
+      que_acepta: punto.que_acepta || [],
       activo: punto.activo !== false,
     })
     setEditId(punto.id)
@@ -80,12 +80,12 @@ export default function AdminPuntos() {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target
-    if (type === 'checkbox' && name === 'acepta') {
+    if (type === 'checkbox' && name === 'que_acepta') {
       setForm((f) => ({
         ...f,
-        acepta: checked
-          ? [...f.acepta, value]
-          : f.acepta.filter((a) => a !== value),
+        que_acepta: checked
+          ? [...f.que_acepta, value]
+          : f.que_acepta.filter((a) => a !== value),
       }))
     } else if (type === 'checkbox') {
       setForm((f) => ({ ...f, [name]: checked }))
@@ -300,9 +300,9 @@ export default function AdminPuntos() {
                       >
                         <input
                           type="checkbox"
-                          name="acepta"
+                          name="que_acepta"
                           value={cat.nombre}
-                          checked={form.acepta.includes(cat.nombre)}
+                          checked={form.que_acepta.includes(cat.nombre)}
                           onChange={handleChange}
                           className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                         />

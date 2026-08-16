@@ -37,6 +37,7 @@ export default function ListaPuntos({ tipo = 'acopio' }) {
   const [puntos, setPuntos] = useState([])
   const [emergencias, setEmergencias] = useState([])
   const [emergenciaId, setEmergenciaId] = useState('')
+  const [categoriaFiltro, setCategoriaFiltro] = useState('')
   const [loading, setLoading] = useState(true)
 
   const accentColor = isAlbergue ? '#1d4ed8' : '#16a34a'
@@ -60,6 +61,10 @@ export default function ListaPuntos({ tipo = 'acopio' }) {
       .finally(() => setLoading(false))
   }, [tipo, emergenciaId])
 
+  const puntosVisibles = categoriaFiltro
+    ? puntos.filter(p => p.que_acepta?.includes(categoriaFiltro))
+    : puntos
+
   return (
     <div style={{ background: dark, minHeight: '100vh', color: text, fontFamily: 'system-ui,-apple-system,sans-serif', paddingBottom: 100 }}>
 
@@ -67,7 +72,7 @@ export default function ListaPuntos({ tipo = 'acopio' }) {
       <div style={{ padding: '20px 18px 16px', borderBottom: `1px solid ${border}` }}>
         <h1 style={{ fontSize: 22, fontWeight: 800, margin: 0 }}>{title}</h1>
         <p style={{ fontSize: 12, color: muted, marginTop: 4, marginBottom: 0 }}>
-          {puntos.length} {isAlbergue ? 'albergues disponibles' : 'puntos activos'}
+          {puntosVisibles.length} {isAlbergue ? 'albergues disponibles' : 'puntos activos'}
         </p>
       </div>
 
@@ -85,13 +90,33 @@ export default function ListaPuntos({ tipo = 'acopio' }) {
         </div>
       )}
 
+      {/* Category filter chips */}
+      {!isAlbergue && (
+        <div style={{ padding: '10px 18px 0', overflowX: 'auto', whiteSpace: 'nowrap', display: 'flex', gap: 8, scrollbarWidth: 'none' }}>
+          {['', 'Alimentos', 'Medicamentos', 'Higiene', 'Agua', 'Ropa y Abrigo', 'Colchonetas y Cobijas', 'Herramientas', 'Otro'].map(cat => (
+            <button
+              key={cat}
+              onClick={() => setCategoriaFiltro(cat)}
+              style={{
+                flexShrink: 0, padding: '5px 12px', borderRadius: 20, fontSize: 11, fontWeight: 600,
+                border: 'none', cursor: 'pointer',
+                background: categoriaFiltro === cat ? accentColor : '#21262d',
+                color: categoriaFiltro === cat ? 'white' : muted,
+              }}
+            >
+              {cat || 'Todos'}
+            </button>
+          ))}
+        </div>
+      )}
+
       {/* List */}
       <div style={{ padding: '12px 18px 0' }}>
         {loading ? (
           <div style={{ textAlign: 'center', padding: '60px 0', color: muted, fontSize: 14 }}>
             Cargando...
           </div>
-        ) : puntos.length === 0 ? (
+        ) : puntosVisibles.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '60px 0' }}>
             <div style={{ fontSize: 48, marginBottom: 12, opacity: 0.3 }}>
               <svg width="64" height="64" viewBox="0 0 24 24" fill={muted}><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>
@@ -103,7 +128,7 @@ export default function ListaPuntos({ tipo = 'acopio' }) {
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            {puntos.map(p => (
+            {puntosVisibles.map(p => (
               <div key={p.id} style={{ background: card, border: `1px solid ${border}`, borderRadius: 16, overflow: 'hidden' }}>
                 {/* Card header */}
                 <div style={{ background: accentColor, padding: '14px 16px' }}>

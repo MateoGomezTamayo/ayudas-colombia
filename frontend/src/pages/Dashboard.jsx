@@ -4,6 +4,7 @@ import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { getEmergencias, getSolicitudes, getPuntosAcopio } from '../api'
+import api from '../api'
 
 delete L.Icon.Default.prototype._getIconUrl
 
@@ -92,6 +93,11 @@ export default function Dashboard() {
   const [puntos, setPuntos] = useState([])
   const [refugios, setRefugios] = useState([])
   const [search, setSearch] = useState('')
+  const [voluntariosCount, setVoluntariosCount] = useState(0)
+
+  useEffect(() => {
+    api.get('/voluntarios').then(r => setVoluntariosCount(r.data.length)).catch(() => {})
+  }, [])
 
   useEffect(() => {
     getEmergencias()
@@ -127,16 +133,35 @@ export default function Dashboard() {
       <div style={{ padding: '24px 18px 10px', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
         <div>
           <h1 style={{ fontSize: 24, fontWeight: 800, margin: 0, letterSpacing: -0.5 }}>Encuentra ayuda</h1>
-          <p style={{ fontSize: 13, color: C.muted, marginTop: 4, marginBottom: 0 }}>
-            {emergenciaActiva ? emergenciaActiva.nombre : 'Colombia'}
-          </p>
+          <p style={{ fontSize: 13, color: C.muted, marginTop: 4, marginBottom: 0 }}>Colombia</p>
         </div>
-        {urgentes > 0 && (
-          <div style={{ background: C.red, borderRadius: 20, padding: '5px 13px', fontSize: 12, fontWeight: 700, flexShrink: 0, marginTop: 4 }}>
-            {urgentes} urgentes
-          </div>
-        )}
       </div>
+
+      {/* Emergency alert notifications */}
+      {emergencias.length > 0 && (
+        <div style={{ padding: '0 18px 4px', display: 'flex', flexDirection: 'column', gap: 6 }}>
+          {emergencias.map(em => (
+            <div key={em.id} style={{
+              display: 'flex', alignItems: 'center', gap: 10,
+              background: 'rgba(220,38,38,0.08)',
+              border: '1px solid rgba(220,38,38,0.25)',
+              borderRadius: 12, padding: '10px 14px',
+            }}>
+              <div style={{ position: 'relative', flexShrink: 0 }}>
+                <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#ef4444' }} />
+                <div style={{ position: 'absolute', inset: -3, borderRadius: '50%', border: '2px solid #ef4444', animation: 'pulse-ring 1.5s ease-out infinite' }} />
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 12, fontWeight: 700, color: '#fca5a5', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{em.nombre}</div>
+                <div style={{ fontSize: 10, color: C.muted, marginTop: 1 }}>
+                  {[em.tipo, em.departamento, em.municipio].filter(Boolean).join(' · ')}
+                </div>
+              </div>
+              <span style={{ fontSize: 9, fontWeight: 700, padding: '2px 7px', borderRadius: 20, background: 'rgba(220,38,38,0.25)', color: '#f87171', flexShrink: 0 }}>ACTIVA</span>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Search */}
       <div style={{ padding: '6px 18px 16px' }}>
@@ -286,42 +311,70 @@ export default function Dashboard() {
         </Link>
       </div>
 
-      {/* Urgentes list preview */}
-      {solicitudes.filter(s => s.prioridad === 'alta' && s.estado !== 'cubierto').slice(0, 3).length > 0 && (
+      {/* Recent solicitudes — all priorities, most recent first */}
+      {solicitudes.length > 0 && (
         <div style={{ padding: '20px 18px 0' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-            <span style={{ fontSize: 13, fontWeight: 700, color: C.text }}>Necesitan ayuda ahora</span>
+            <span style={{ fontSize: 13, fontWeight: 700, color: C.text }}>Solicitudes recientes</span>
             <Link to="/ayudas" style={{ fontSize: 12, color: C.blueLight, textDecoration: 'none' }}>Ver todas</Link>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            {solicitudes.filter(s => s.prioridad === 'alta' && s.estado !== 'cubierto').slice(0, 3).map(s => (
-              <Link key={s.id} to="/ayudas" style={{ textDecoration: 'none' }}>
-                <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 14, padding: '12px 14px', display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#ef4444', flexShrink: 0 }} />
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontWeight: 600, fontSize: 13, color: C.text, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                      {s.ciudad}{s.departamento ? `, ${s.departamento}` : ''}
+            {solicitudes.filter(s => s.estado !== 'cubierto').slice(0, 3).map(s => {
+              return (
+                <Link key={s.id} to="/ayudas" style={{ textDecoration: 'none' }}>
+                  <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 14, padding: '12px 14px', display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#58a6ff', flexShrink: 0 }} />
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontWeight: 600, fontSize: 13, color: C.text, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {s.ciudad}{s.departamento ? `, ${s.departamento}` : ''}
+                      </div>
+                      {s.descripcion && (
+                        <div style={{ fontSize: 11, color: C.muted, marginTop: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          {s.descripcion}
+                        </div>
+                      )}
+                      {s.items?.length > 0 && (
+                        <div style={{ fontSize: 11, color: '#f59e0b', marginTop: 2 }}>
+                          {s.items.slice(0, 2).map(it => it.producto).join(', ')}{s.items.length > 2 ? '...' : ''}
+                        </div>
+                      )}
                     </div>
-                    {s.descripcion && (
-                      <div style={{ fontSize: 11, color: C.muted, marginTop: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                        {s.descripcion}
-                      </div>
-                    )}
-                    {s.items?.length > 0 && (
-                      <div style={{ fontSize: 11, color: '#f59e0b', marginTop: 2 }}>
-                        {s.items.slice(0, 2).map(it => it.producto).join(', ')}{s.items.length > 2 ? '...' : ''}
-                      </div>
-                    )}
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill={C.muted}>
+                      <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
+                    </svg>
                   </div>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill={C.muted}>
-                    <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
-                  </svg>
-                </div>
-              </Link>
-            ))}
+                </Link>
+              )
+            })}
           </div>
         </div>
       )}
+
+      {/* Voluntariado card */}
+      <div style={{ padding: '20px 18px 0' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+          <span style={{ fontSize: 13, fontWeight: 700, color: C.text }}>Voluntariado</span>
+          <Link to="/voluntariado" style={{ fontSize: 12, color: C.blueLight, textDecoration: 'none' }}>Ver todos</Link>
+        </div>
+        <Link to="/voluntariado" style={{ textDecoration: 'none' }}>
+          <div style={{ background: 'linear-gradient(135deg,#1e3a5f,#7c3aed)', borderRadius: 16, padding: '16px 18px', display: 'flex', alignItems: 'center', gap: 14 }}>
+            <div style={{ background: 'rgba(255,255,255,0.15)', borderRadius: 12, width: 46, height: 46, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
+              </svg>
+            </div>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontWeight: 700, fontSize: 16, color: 'white' }}>Ser Voluntario</div>
+              <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.7)', marginTop: 3 }}>
+                {voluntariosCount > 0 ? `${voluntariosCount} oportunidades activas` : 'Suma tu esfuerzo a Colombia'}
+              </div>
+            </div>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.5)" strokeWidth="2.5">
+              <polyline points="9 18 15 12 9 6" />
+            </svg>
+          </div>
+        </Link>
+      </div>
 
     </div>
   )
