@@ -82,24 +82,7 @@ export default function Voluntariado() {
         <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#22c55e', flexShrink: 0 }} />
         <div>
           <div style={{ fontSize: 13, fontWeight: 600, color: text }}>Hoja en tiempo real - Bogota</div>
-          <div style={{ fontSize: 11, color: muted, marginTop: 2 }}>27+ puntos de donaciones en Bogotá activos</div>
-        </div>
-        <svg style={{ marginLeft: 'auto', flexShrink: 0 }} width="16" height="16" viewBox="0 0 24 24" fill={muted}>
-          <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
-        </svg>
-      </a>
-
-      {/* Donar en línea */}
-      <a
-        href="https://colombiateamo.com/"
-        target="_blank"
-        rel="noopener noreferrer"
-        style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '10px 18px 0', background: '#16a34a15', border: '1px solid #16a34a40', borderRadius: 12, padding: '12px 14px', textDecoration: 'none' }}
-      >
-        <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#4ade80', flexShrink: 0 }} />
-        <div>
-          <div style={{ fontSize: 13, fontWeight: 600, color: '#4ade80' }}>Donar en línea</div>
-          <div style={{ fontSize: 11, color: muted, marginTop: 2 }}>colombiateamo.com — donaciones digitales</div>
+          <div style={{ fontSize: 11, color: muted, marginTop: 2 }}>60+ puntos de voluntariado actualizados en vivo</div>
         </div>
         <svg style={{ marginLeft: 'auto', flexShrink: 0 }} width="16" height="16" viewBox="0 0 24 24" fill={muted}>
           <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
@@ -110,31 +93,21 @@ export default function Voluntariado() {
       <div style={{ padding: '14px 18px 0' }}>
         {loading ? (
           <div style={{ textAlign: 'center', padding: '40px 0', color: muted }}>Cargando...</div>
-        ) : filtrado.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '40px 0' }}>
-            <div style={{ fontSize: 36, marginBottom: 10 }}>🙌</div>
-            <p style={{ color: muted, fontSize: 14, marginBottom: 16 }}>No hay oportunidades registradas aún.</p>
-            <a
-              href="https://docs.google.com/spreadsheets/d/1-hMGwC0XaSu5ddZ896gYyVRpmbPkVYg3NJ_6rSxK4Y8/htmlview"
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{ background: '#1d4ed8', color: 'white', textDecoration: 'none', borderRadius: 12, padding: '10px 20px', fontSize: 13, fontWeight: 600 }}
-            >
-              Ver hoja en tiempo real →
-            </a>
-          </div>
         ) : filtrado.map(v => {
           const t = TIPO_STYLE[v.tipo] || TIPO_STYLE.presencial
+          const headerBg = v.tipo === 'transporte' ? '#14532d' : v.tipo === 'virtual' ? '#312e81' : '#1e3a5f'
+          const headerAccent = v.tipo === 'transporte' ? '#16a34a' : v.tipo === 'virtual' ? '#6366f1' : '#1d4ed8'
           return (
             <div key={v.id} style={{ background: card, border: `1px solid ${border}`, borderRadius: 16, marginBottom: 12, overflow: 'hidden' }}>
-              {/* Header */}
-              <div style={{ padding: '13px 16px', borderBottom: `1px solid ${border}` }}>
+
+              {/* Header — mismo estilo que Ayudas/ListaPuntos */}
+              <div style={{ background: headerBg, borderBottom: `2px solid ${headerAccent}`, padding: '13px 16px' }}>
                 <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 10 }}>
-                  <div style={{ fontWeight: 700, fontSize: 14, color: text, lineHeight: 1.3 }}>{v.nombre}</div>
-                  <span style={{ background: t.bg, color: t.color, borderRadius: 20, padding: '2px 10px', fontSize: 10, fontWeight: 700, flexShrink: 0 }}>{t.label}</span>
+                  <div style={{ fontWeight: 700, fontSize: 14, color: 'white', lineHeight: 1.3 }}>{v.nombre}</div>
+                  <span style={{ background: 'rgba(0,0,0,0.3)', color: t.color, borderRadius: 20, padding: '2px 10px', fontSize: 10, fontWeight: 700, flexShrink: 0 }}>{t.label}</span>
                 </div>
                 {v.ciudad && (
-                  <div style={{ fontSize: 12, color: muted, marginTop: 5, display: 'flex', alignItems: 'center', gap: 4 }}>
+                  <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.65)', marginTop: 4, display: 'flex', alignItems: 'center', gap: 4 }}>
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>
                     {v.ciudad}
                   </div>
@@ -147,29 +120,29 @@ export default function Voluntariado() {
                   <p style={{ fontSize: 13, color: '#c9d1d9', margin: '0 0 12px', lineHeight: 1.5 }}>{v.descripcion}</p>
                 )}
 
-                {/* Action buttons */}
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                {/* Action buttons — full width like Ayudas */}
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, paddingTop: v.descripcion ? 10 : 0, borderTop: v.descripcion ? `1px solid ${border}` : 'none' }}>
                   {v.link_inscripcion && (
                     <a href={v.link_inscripcion} target="_blank" rel="noopener noreferrer"
-                      style={{ background: '#1d4ed8', color: 'white', textDecoration: 'none', borderRadius: 10, padding: '7px 14px', fontSize: 12, fontWeight: 600 }}>
+                      style={{ flex: 1, minWidth: 120, background: '#1d4ed8', color: 'white', textDecoration: 'none', borderRadius: 10, padding: '9px 12px', fontSize: 12, fontWeight: 600, textAlign: 'center' }}>
                       Inscribirme
                     </a>
                   )}
                   {v.whatsapp && (
                     <a href={v.whatsapp} target="_blank" rel="noopener noreferrer"
-                      style={{ background: '#16a34a20', color: '#4ade80', border: '1px solid #16a34a40', textDecoration: 'none', borderRadius: 10, padding: '7px 14px', fontSize: 12, fontWeight: 600 }}>
+                      style={{ flex: 1, minWidth: 120, background: '#16a34a', color: 'white', border: 'none', textDecoration: 'none', borderRadius: 10, padding: '9px 12px', fontSize: 12, fontWeight: 600, textAlign: 'center' }}>
                       Unirse al WhatsApp
                     </a>
                   )}
                   {v.instagram && (
                     <a href={`https://instagram.com/${v.instagram}`} target="_blank" rel="noopener noreferrer"
-                      style={{ background: '#9333ea20', color: '#c084fc', border: '1px solid #9333ea40', textDecoration: 'none', borderRadius: 10, padding: '7px 14px', fontSize: 12, fontWeight: 600 }}>
+                      style={{ flex: 1, minWidth: 120, background: '#7c3aed', color: 'white', textDecoration: 'none', borderRadius: 10, padding: '9px 12px', fontSize: 12, fontWeight: 600, textAlign: 'center' }}>
                       Instagram
                     </a>
                   )}
                   {v.telefono && (
                     <a href={`tel:${v.telefono}`}
-                      style={{ background: '#0f172a', color: '#58a6ff', border: `1px solid ${border}`, textDecoration: 'none', borderRadius: 10, padding: '7px 14px', fontSize: 12, fontWeight: 600 }}>
+                      style={{ flex: 1, minWidth: 120, background: '#21262d', color: '#58a6ff', border: `1px solid ${border}`, textDecoration: 'none', borderRadius: 10, padding: '9px 12px', fontSize: 12, fontWeight: 600, textAlign: 'center' }}>
                       {v.telefono}
                     </a>
                   )}

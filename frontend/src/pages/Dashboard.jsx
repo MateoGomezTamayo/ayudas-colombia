@@ -6,6 +6,57 @@ import 'leaflet/dist/leaflet.css'
 import { getEmergencias, getSolicitudes, getPuntosAcopio } from '../api'
 import api from '../api'
 
+// Coordenadas aproximadas de municipios colombianos para fallback cuando no hay lat/lng
+const COLOMBIA_COORDS = {
+  'bogota': [4.7110, -74.0721], 'bogotá': [4.7110, -74.0721],
+  'medellin': [6.2442, -75.5812], 'medellín': [6.2442, -75.5812],
+  'cali': [3.4516, -76.5320],
+  'barranquilla': [10.9639, -74.7964],
+  'cartagena': [10.3910, -75.4794],
+  'bucaramanga': [7.1193, -73.1227],
+  'pereira': [4.8143, -75.6946],
+  'manizales': [5.0703, -75.5138],
+  'armenia': [4.5339, -75.6811],
+  'ibague': [4.4389, -75.2322], 'ibagué': [4.4389, -75.2322],
+  'cucuta': [7.8939, -72.5078], 'cúcuta': [7.8939, -72.5078],
+  'santa marta': [11.2408, -74.2110],
+  'villavicencio': [4.1420, -73.6266],
+  'pasto': [1.2136, -77.2811],
+  'monteria': [8.7575, -75.8899], 'montería': [8.7575, -75.8899],
+  'buenaventura': [3.8801, -77.0311],
+  'quibdo': [5.6947, -76.6583], 'quibdó': [5.6947, -76.6583],
+  'popayan': [2.4419, -76.6073], 'popayán': [2.4419, -76.6073],
+  'neiva': [2.9273, -75.2819],
+  'palmira': [3.5397, -76.3036],
+  'bello': [6.3369, -75.5583],
+  'soledad': [10.9200, -74.7681],
+  'soacha': [4.5792, -74.2143],
+  'floridablanca': [7.0634, -73.0888],
+  'valledupar': [10.4769, -73.2504],
+  'sincelejo': [9.3047, -75.3978],
+  'itagui': [6.1847, -75.5997], 'itagüi': [6.1847, -75.5997],
+  'florencia': [1.6144, -75.6062],
+  'turbo': [8.0936, -76.7275],
+  'apartado': [7.8828, -76.6283], 'apartadó': [7.8828, -76.6283],
+  'rionegro': [6.1538, -75.3740],
+  'dosquebradas': [4.8390, -75.6656],
+  'envigado': [6.1719, -75.5911],
+  'girardot': [4.3036, -74.8027],
+  'tunja': [5.5353, -73.3678],
+  'leticia': [-4.2153, -69.9406],
+  'tumaco': [1.7990, -78.7632],
+  'arauca': [7.0907, -70.7604],
+  'yopal': [5.3378, -72.3950],
+  'mocoa': [1.1522, -76.6497],
+  'san andres': [12.5847, -81.7006],
+}
+
+function getCoords(s) {
+  if (s.lat && s.lng) return [parseFloat(s.lat), parseFloat(s.lng)]
+  const key = (s.ciudad || '').toLowerCase().trim()
+  return COLOMBIA_COORDS[key] || null
+}
+
 delete L.Icon.Default.prototype._getIconUrl
 
 function pin(color) {
@@ -133,38 +184,19 @@ export default function Dashboard() {
       <div style={{ padding: '24px 18px 10px', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
         <div>
           <h1 style={{ fontSize: 24, fontWeight: 800, margin: 0, letterSpacing: -0.5 }}>Encuentra ayuda</h1>
-          <p style={{ fontSize: 13, color: C.muted, marginTop: 4, marginBottom: 0 }}>Colombia</p>
+          <p style={{ fontSize: 13, color: C.muted, marginTop: 4, marginBottom: 0 }}>
+            {emergenciaActiva ? emergenciaActiva.nombre : 'Colombia'}
+          </p>
         </div>
+        {urgentes > 0 && (
+          <div style={{ background: C.red, borderRadius: 20, padding: '5px 13px', fontSize: 12, fontWeight: 700, flexShrink: 0, marginTop: 4 }}>
+            {urgentes} urgentes
+          </div>
+        )}
       </div>
 
-      {/* Emergency alert notifications */}
-      {emergencias.length > 0 && (
-        <div style={{ padding: '0 18px 4px', display: 'flex', flexDirection: 'column', gap: 6 }}>
-          {emergencias.map(em => (
-            <div key={em.id} style={{
-              display: 'flex', alignItems: 'center', gap: 10,
-              background: 'rgba(220,38,38,0.08)',
-              border: '1px solid rgba(220,38,38,0.25)',
-              borderRadius: 12, padding: '10px 14px',
-            }}>
-              <div style={{ position: 'relative', flexShrink: 0 }}>
-                <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#ef4444' }} />
-                <div style={{ position: 'absolute', inset: -3, borderRadius: '50%', border: '2px solid #ef4444', animation: 'pulse-ring 1.5s ease-out infinite' }} />
-              </div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 12, fontWeight: 700, color: '#fca5a5', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{em.nombre}</div>
-                <div style={{ fontSize: 10, color: C.muted, marginTop: 1 }}>
-                  {[em.tipo, em.departamento, em.municipio].filter(Boolean).join(' · ')}
-                </div>
-              </div>
-              <span style={{ fontSize: 9, fontWeight: 700, padding: '2px 7px', borderRadius: 20, background: 'rgba(220,38,38,0.25)', color: '#f87171', flexShrink: 0 }}>ACTIVA</span>
-            </div>
-          ))}
-        </div>
-      )}
-
       {/* Search */}
-      <div style={{ padding: '6px 18px 16px' }}>
+      <div style={{ padding: '6px 18px 14px' }}>
         <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 14, padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 10 }}>
           <span style={{ color: C.muted, display: 'flex', flexShrink: 0 }}>
             <IcoSearch />
@@ -178,45 +210,73 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Urgentes alert banner */}
-      {urgentes > 0 && (
-        <Link to="/ayudas" style={{ display: 'block', margin: '0 18px 16px', textDecoration: 'none' }}>
-          <div style={{
-            background: 'linear-gradient(135deg,#7f1d1d,#dc2626)',
-            borderRadius: 14, padding: '13px 16px',
-            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-            gap: 12,
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'white', animation: 'pulse 1.5s infinite' }} />
-              <div>
-                <div style={{ fontWeight: 700, fontSize: 13, color: 'white' }}>
-                  {urgentes} solicitud{urgentes > 1 ? 'es' : ''} urgente{urgentes > 1 ? 's' : ''}
-                </div>
-                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.75)', marginTop: 2 }}>
-                  Personas necesitan ayuda ahora
-                </div>
-              </div>
+      {/* SOLICITUDES RECIENTES — arriba */}
+      {solicitudes.filter(s => s.estado !== 'cubierto').length > 0 && (
+        <div style={{ padding: '0 18px 18px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#ef4444' }} />
+              <span style={{ fontSize: 13, fontWeight: 700, color: C.text }}>Solicitudes recientes</span>
             </div>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="white">
-              <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
-            </svg>
+            <Link to="/ayudas" style={{ fontSize: 12, color: C.blueLight, textDecoration: 'none' }}>Ver todas</Link>
           </div>
-        </Link>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {solicitudes.filter(s => s.estado !== 'cubierto').slice(0, 5).map(s => (
+              <Link key={s.id} to="/ayudas" style={{ textDecoration: 'none' }}>
+                <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 14, padding: '13px 14px', display: 'flex', alignItems: 'center', gap: 12 }}
+                  onMouseEnter={e => e.currentTarget.style.borderColor = '#ef4444'}
+                  onMouseLeave={e => e.currentTarget.style.borderColor = C.border}>
+                  <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#ef4444', flexShrink: 0 }} />
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontWeight: 600, fontSize: 13, color: C.text }}>
+                      {s.ciudad}{s.departamento ? `, ${s.departamento}` : ''}
+                    </div>
+                    {s.descripcion && (
+                      <div style={{ fontSize: 11, color: C.muted, marginTop: 2, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+                        {s.descripcion}
+                      </div>
+                    )}
+                    {s.items?.length > 0 && (
+                      <div style={{ fontSize: 11, color: '#f59e0b', marginTop: 3 }}>
+                        {s.items.slice(0, 2).map(it => it.producto).join(' · ')}{s.items.length > 2 ? '...' : ''}
+                      </div>
+                    )}
+                  </div>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill={C.muted} style={{ flexShrink: 0 }}>
+                    <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
+                  </svg>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
       )}
 
       {/* Map */}
       <div style={{ margin: '0 18px', borderRadius: 18, overflow: 'hidden', border: `1px solid ${C.border}` }}>
         <MapContainer center={[4.5, -74.0]} zoom={6} style={{ height: 240 }} zoomControl={false}>
+          {/* Mapa oscuro de Esri: gratuito y sin API key (CARTO empezó a exigir una) */}
           <TileLayer
-            url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-            attribution="&copy; CartoDB"
+            url="https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}"
+            attribution="&copy; Esri, HERE, Garmin, &copy; OpenStreetMap"
+            maxZoom={16}
           />
-          {solicitudes.filter(s => s.lat && s.lng).map(s => (
-            <Marker key={'s' + s.id} position={[s.lat, s.lng]} icon={pin('#ef4444')}>
-              <Popup><b>{s.ciudad}</b><br />{s.descripcion}</Popup>
+          <TileLayer
+            url="https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}"
+            maxZoom={16}
+          />
+          {solicitudes.filter(s => getCoords(s)).map(s => {
+            const pos = getCoords(s)
+            const col = s.prioridad === 'alta' ? '#ef4444' : s.prioridad === 'media' ? '#f59e0b' : '#22c55e'
+            return (
+            <Marker key={'s' + s.id} position={pos} icon={pin(col)}>
+              <Popup>
+                <b>{s.ciudad}{s.departamento ? `, ${s.departamento}` : ''}</b>
+                {s.descripcion && <><br />{s.descripcion}</>}
+                {s.items?.length > 0 && <><br />{s.items.map(i => i.producto).join(', ')}</>}
+              </Popup>
             </Marker>
-          ))}
+          )})}
           {puntos.filter(p => p.lat && p.lng).map(p => (
             <Marker key={'p' + p.id} position={[p.lat, p.lng]} icon={pin('#22c55e')}>
               <Popup><b>{p.nombre}</b><br />{p.ciudad}</Popup>
@@ -310,45 +370,6 @@ export default function Dashboard() {
           </svg>
         </Link>
       </div>
-
-      {/* Recent solicitudes — all priorities, most recent first */}
-      {solicitudes.length > 0 && (
-        <div style={{ padding: '20px 18px 0' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-            <span style={{ fontSize: 13, fontWeight: 700, color: C.text }}>Solicitudes recientes</span>
-            <Link to="/ayudas" style={{ fontSize: 12, color: C.blueLight, textDecoration: 'none' }}>Ver todas</Link>
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            {solicitudes.filter(s => s.estado !== 'cubierto').slice(0, 3).map(s => {
-              return (
-                <Link key={s.id} to="/ayudas" style={{ textDecoration: 'none' }}>
-                  <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 14, padding: '12px 14px', display: 'flex', alignItems: 'center', gap: 12 }}>
-                    <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#58a6ff', flexShrink: 0 }} />
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontWeight: 600, fontSize: 13, color: C.text, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                        {s.ciudad}{s.departamento ? `, ${s.departamento}` : ''}
-                      </div>
-                      {s.descripcion && (
-                        <div style={{ fontSize: 11, color: C.muted, marginTop: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                          {s.descripcion}
-                        </div>
-                      )}
-                      {s.items?.length > 0 && (
-                        <div style={{ fontSize: 11, color: '#f59e0b', marginTop: 2 }}>
-                          {s.items.slice(0, 2).map(it => it.producto).join(', ')}{s.items.length > 2 ? '...' : ''}
-                        </div>
-                      )}
-                    </div>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill={C.muted}>
-                      <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
-                    </svg>
-                  </div>
-                </Link>
-              )
-            })}
-          </div>
-        </div>
-      )}
 
       {/* Voluntariado card */}
       <div style={{ padding: '20px 18px 0' }}>

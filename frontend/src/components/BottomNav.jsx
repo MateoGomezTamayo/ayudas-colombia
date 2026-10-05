@@ -51,16 +51,17 @@ export default function BottomNav() {
   })
 
   return (
+    <>
     <nav style={{
       position: 'fixed', bottom: 0, left: 0, right: 0,
       background: card,
       borderTop: '1px solid #21262d',
       display: 'flex',
-      alignItems: 'center',
-      paddingBottom: 'env(safe-area-inset-bottom, 8px)',
-      paddingTop: 8,
+      flexDirection: 'column',
+      paddingBottom: 'env(safe-area-inset-bottom, 4px)',
       zIndex: 1000,
     }}>
+      <div style={{ display: 'flex', alignItems: 'center', paddingTop: 8, paddingBottom: 4 }}>
       <Link to="/" style={tab(pathname === '/')}>
         <div style={{ position: 'relative' }}>
           <IcoHome />
@@ -114,6 +115,17 @@ export default function BottomNav() {
         </div>
         <span>Ayudas</span>
       </Link>
+      </div>
+      <div style={{ textAlign: 'center', fontSize: 9, color: '#484f58', paddingBottom: 4, letterSpacing: 0.3 }}>
+        powered by <span style={{ color: '#58a6ff', fontWeight: 600 }}>Vextrum Labs</span>
+      </div>
     </nav>
+    <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, textAlign: 'center', fontSize: 9, color: '#484f58', paddingBottom: 2, zIndex: 999, pointerEvents: 'none', letterSpacing: 0.3 }}>
+      powered by <span style={{ color: '#58a6ff', fontWeight: 600 }}>Vextrum Labs</span>
+    </div>
+    <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, textAlign: 'center', fontSize: 9, color: '#484f58', paddingBottom: 2, zIndex: 999, pointerEvents: 'none', letterSpacing: 0.3 }}>
+      powered by <span style={{ color: '#58a6ff', fontWeight: 600 }}>Vextrum Labs</span>
+    </div>
+    </>
   )
 }

@@ -35,9 +35,9 @@ const PRIORITY = {
 }
 
 const STATUS_STEPS = [
-  { key: 'pendiente',  label: 'Recibida'  },
-  { key: 'en_proceso', label: 'En proceso' },
-  { key: 'cubierto',   label: 'Cubierta'  },
+  { key: 'pendiente',  label: 'Recibida'   },
+  { key: 'en_proceso', label: 'Procesada'  },
+  { key: 'cubierto',   label: 'Solucionada'},
 ]
 
 function stepIndex(estado) {
@@ -86,14 +86,14 @@ function Checklist({ estado }) {
   )
 }
 
-const TABS = ['urgentes', 'en_proceso', 'todas']
-const TAB_LABELS = { urgentes: 'Urgentes', en_proceso: 'En proceso', todas: 'Todas' }
+const TABS = ['solicitudes', 'procesadas', 'solucionadas']
+const TAB_LABELS = { solicitudes: 'Solicitudes', procesadas: 'Procesadas', solucionadas: 'Solucionadas' }
 
 export default function Ayudas() {
   const [solicitudes, setSolicitudes] = useState([])
   const [emergencias, setEmergencias] = useState([])
   const [emergenciaId, setEmergenciaId] = useState('')
-  const [tab, setTab] = useState('urgentes')
+  const [tab, setTab] = useState('solicitudes')
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -111,15 +111,15 @@ export default function Ayudas() {
   }, [emergenciaId])
 
   const filtered = solicitudes.filter(s => {
-    if (tab === 'urgentes')   return s.prioridad === 'alta' && s.estado !== 'cubierto'
-    if (tab === 'en_proceso') return s.estado === 'en_proceso'
-    return true
+    if (tab === 'solicitudes')  return s.estado === 'pendiente'
+    if (tab === 'procesadas')   return s.estado === 'en_proceso'
+    return s.estado === 'cubierto'
   })
 
   const counts = {
-    urgentes:   solicitudes.filter(s => s.prioridad === 'alta' && s.estado !== 'cubierto').length,
-    en_proceso: solicitudes.filter(s => s.estado === 'en_proceso').length,
-    todas:      solicitudes.length,
+    solicitudes:  solicitudes.filter(s => s.estado === 'pendiente').length,
+    procesadas:   solicitudes.filter(s => s.estado === 'en_proceso').length,
+    solucionadas: solicitudes.filter(s => s.estado === 'cubierto').length,
   }
 
   return (
@@ -131,7 +131,7 @@ export default function Ayudas() {
           <div>
             <h1 style={{ fontSize: 22, fontWeight: 800, margin: 0 }}>Ayudas</h1>
             <p style={{ fontSize: 12, color: muted, marginTop: 4, marginBottom: 0 }}>
-              {filtered.length} solicitudes activas
+              {emergencias[0]?.nombre || 'Solicitudes activas'}
             </p>
           </div>
           <Link
@@ -141,54 +141,6 @@ export default function Ayudas() {
             + Pedir ayuda
           </Link>
         </div>
-
-        {/* Emergency notification cards */}
-        {emergencias.length > 0 && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 14 }}>
-            {emergencias.map(em => {
-              const isSelected = emergenciaId === String(em.id)
-              return (
-                <button
-                  key={em.id}
-                  onClick={() => setEmergenciaId(isSelected ? '' : String(em.id))}
-                  style={{
-                    display: 'flex', alignItems: 'center', gap: 10,
-                    background: isSelected ? 'rgba(220,38,38,0.12)' : 'rgba(220,38,38,0.05)',
-                    border: `1px solid ${isSelected ? 'rgba(220,38,38,0.5)' : 'rgba(220,38,38,0.2)'}`,
-                    borderRadius: 10, padding: '9px 12px',
-                    cursor: 'pointer', textAlign: 'left', width: '100%',
-                  }}
-                >
-                  {/* Pulsing dot */}
-                  <div style={{ position: 'relative', flexShrink: 0 }}>
-                    <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#ef4444' }} />
-                    <div style={{
-                      position: 'absolute', inset: -3,
-                      borderRadius: '50%', border: '2px solid #ef4444',
-                      animation: 'pulse-ring 1.5s ease-out infinite',
-                      opacity: isSelected ? 1 : 0.6,
-                    }} />
-                  </div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 12, fontWeight: 700, color: '#fca5a5', lineHeight: 1.2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                      {em.nombre}
-                    </div>
-                    <div style={{ fontSize: 10, color: muted, marginTop: 2 }}>
-                      {[em.tipo, em.departamento, em.municipio].filter(Boolean).join(' · ')}
-                    </div>
-                  </div>
-                  <span style={{
-                    fontSize: 9, fontWeight: 700, padding: '2px 7px', borderRadius: 20, flexShrink: 0,
-                    background: isSelected ? '#dc2626' : 'rgba(220,38,38,0.2)',
-                    color: isSelected ? 'white' : '#f87171',
-                  }}>
-                    {isSelected ? 'ACTIVA ✓' : 'ACTIVA'}
-                  </span>
-                </button>
-              )
-            })}
-          </div>
-        )}
 
         {/* Tabs */}
         <div style={{ display: 'flex', gap: 0, marginBottom: -1 }}>
@@ -206,8 +158,9 @@ export default function Ayudas() {
               {TAB_LABELS[t]}
               {counts[t] > 0 && (
                 <span style={{
-                  marginLeft: 5, background: t === 'urgentes' ? '#dc2626' : '#30363d',
-                  color: t === 'urgentes' ? 'white' : muted,
+                  marginLeft: 5,
+                  background: t === 'solicitudes' ? '#dc2626' : t === 'solucionadas' ? '#16a34a' : '#30363d',
+                  color: t === 'solicitudes' ? 'white' : t === 'solucionadas' ? 'white' : muted,
                   borderRadius: 20, padding: '1px 7px', fontSize: 10,
                 }}>
                   {counts[t]}
@@ -233,74 +186,58 @@ export default function Ayudas() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {filtered.map(s => {
               const p = PRIORITY[s.prioridad] || PRIORITY.baja
+              const headerBg = '#1a1a2e'
+              const headerAccent = '#dc2626'
               return (
-                <div key={s.id} style={{ background: card, border: `1px solid ${border}`, borderRadius: 16, padding: '15px 16px' }}>
+                <div key={s.id} style={{ background: card, border: `1px solid ${border}`, borderRadius: 16, overflow: 'hidden' }}>
 
-                  {/* Top row */}
-                  <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 10, marginBottom: 8 }}>
-                    <div>
-                      <div style={{ fontWeight: 700, fontSize: 15, color: text }}>
-                        {s.ciudad}{s.departamento ? `, ${s.departamento}` : ''}
+                  {/* Card header — estilo ListaPuntos */}
+                  <div style={{ background: headerBg, borderBottom: `2px solid ${headerAccent}`, padding: '13px 16px' }}>
+                    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8 }}>
+                      <div>
+                        <div style={{ fontWeight: 700, fontSize: 15, color: 'white' }}>
+                          {s.ciudad}{s.departamento ? `, ${s.departamento}` : ''}
+                        </div>
+                        <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.65)', marginTop: 3 }}>
+                          {timeAgo(s.created_at)}
+                          {s.nombre_solicitante ? ` · ${s.nombre_solicitante}` : ''}
+                        </div>
                       </div>
-                      <div style={{ fontSize: 11, color: muted, marginTop: 3 }}>{timeAgo(s.created_at)}</div>
                     </div>
-                    <span style={{ background: p.bg, color: p.color, borderRadius: 20, padding: '3px 10px', fontSize: 11, fontWeight: 700, flexShrink: 0 }}>
-                      {p.label}
-                    </span>
                   </div>
 
-                  {/* Description */}
-                  {s.descripcion && (
-                    <p style={{ fontSize: 13, color: muted, margin: '0 0 10px', lineHeight: 1.5 }}>{s.descripcion}</p>
-                  )}
+                  {/* Card body */}
+                  <div style={{ padding: '12px 16px' }}>
+                    {s.descripcion && (
+                      <p style={{ fontSize: 13, color: '#c9d1d9', margin: '0 0 10px', lineHeight: 1.5 }}>{s.descripcion}</p>
+                    )}
 
-                  {/* Items needed */}
-                  {s.items?.length > 0 && (
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 10 }}>
-                      {s.items.map((it, i) => (
-                        <span key={i} style={{ background: '#21262d', color: '#c9d1d9', borderRadius: 8, padding: '3px 10px', fontSize: 11 }}>
-                          {it.producto}{it.cantidad ? `: ${it.cantidad}` : ''}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-
-                  {/* Progress checklist */}
-                  <Checklist estado={s.estado} />
-
-                  {/* Bottom action */}
-                  {s.estado !== 'cubierto' && (
-                    <div style={{ marginTop: 14, paddingTop: 12, borderTop: `1px solid ${border}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
-                      <span style={{ fontSize: 12, color: muted }}>
-                        {s.nombre_solicitante ? s.nombre_solicitante : 'Anonimo'}
-                      </span>
-                      <div style={{ display: 'flex', gap: 8 }}>
-                        {buildWhatsApp(s) && (
-                          <a
-                            href={buildWhatsApp(s)}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            style={{ background: '#16a34a', color: 'white', textDecoration: 'none', borderRadius: 10, padding: '6px 12px', fontSize: 12, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 5 }}
-                          >
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
-                              <path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.553 4.117 1.522 5.847L.057 23.143a.5.5 0 0 0 .6.6l5.297-1.465A11.95 11.95 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.891 0-3.67-.523-5.186-1.432l-.369-.219-3.843 1.063 1.024-3.75-.24-.386A9.96 9.96 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/>
-                            </svg>
-                            WhatsApp
-                          </a>
-                        )}
-                        <Link
-                          to="/acopio"
-                          style={{ background: '#1d4ed8', color: 'white', textDecoration: 'none', borderRadius: 10, padding: '6px 12px', fontSize: 12, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 5 }}
-                        >
-                          Donar
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
-                          </svg>
-                        </Link>
+                    {s.items?.length > 0 && (
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 12 }}>
+                        {s.items.map((it, i) => (
+                          <span key={i} style={{ background: '#21262d', color: '#c9d1d9', borderRadius: 8, padding: '3px 10px', fontSize: 11 }}>
+                            {it.producto}{it.cantidad ? `: ${it.cantidad}` : ''}
+                          </span>
+                        ))}
                       </div>
-                    </div>
-                  )}
+                    )}
+
+                    <Checklist estado={s.estado} />
+
+                    {s.estado !== 'cubierto' && (
+                      <div style={{ marginTop: 12, paddingTop: 10, borderTop: `1px solid ${border}` }}>
+                        {buildWhatsApp(s) ? (
+                          <a href={buildWhatsApp(s)} target="_blank" rel="noopener noreferrer"
+                            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, background: '#16a34a', color: 'white', textDecoration: 'none', borderRadius: 10, padding: '10px', fontSize: 13, fontWeight: 600 }}>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.553 4.117 1.522 5.847L.057 23.143a.5.5 0 0 0 .6.6l5.297-1.465A11.95 11.95 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.891 0-3.67-.523-5.186-1.432l-.369-.219-3.843 1.063 1.024-3.75-.24-.386A9.96 9.96 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+                            Contactar por WhatsApp
+                          </a>
+                        ) : (
+                          <div style={{ fontSize: 12, color: '#8b949e', textAlign: 'center' }}>Sin contacto registrado</div>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </div>
               )
             })}

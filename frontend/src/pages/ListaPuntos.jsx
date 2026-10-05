@@ -37,7 +37,6 @@ export default function ListaPuntos({ tipo = 'acopio' }) {
   const [puntos, setPuntos] = useState([])
   const [emergencias, setEmergencias] = useState([])
   const [emergenciaId, setEmergenciaId] = useState('')
-  const [categoriaFiltro, setCategoriaFiltro] = useState('')
   const [loading, setLoading] = useState(true)
 
   const accentColor = isAlbergue ? '#1d4ed8' : '#16a34a'
@@ -61,10 +60,6 @@ export default function ListaPuntos({ tipo = 'acopio' }) {
       .finally(() => setLoading(false))
   }, [tipo, emergenciaId])
 
-  const puntosVisibles = categoriaFiltro
-    ? puntos.filter(p => p.que_acepta?.includes(categoriaFiltro))
-    : puntos
-
   return (
     <div style={{ background: dark, minHeight: '100vh', color: text, fontFamily: 'system-ui,-apple-system,sans-serif', paddingBottom: 100 }}>
 
@@ -72,9 +67,28 @@ export default function ListaPuntos({ tipo = 'acopio' }) {
       <div style={{ padding: '20px 18px 16px', borderBottom: `1px solid ${border}` }}>
         <h1 style={{ fontSize: 22, fontWeight: 800, margin: 0 }}>{title}</h1>
         <p style={{ fontSize: 12, color: muted, marginTop: 4, marginBottom: 0 }}>
-          {puntosVisibles.length} {isAlbergue ? 'albergues disponibles' : 'puntos activos'}
+          {puntos.length} {isAlbergue ? 'albergues disponibles' : 'puntos activos'}
         </p>
       </div>
+
+      {/* Live map banner — solo para acopio */}
+      {!isAlbergue && (
+        <a
+          href="https://www.google.com/maps/@4.8004247,-74.2817011,11z/data=!4m3!11m2!2sXJQY-o3hsph0A1kkDaEESw!3e3"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '12px 18px 0', background: '#161b22', border: '1px solid #30363d', borderRadius: 12, padding: '12px 14px', textDecoration: 'none' }}
+        >
+          <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#22c55e', flexShrink: 0 }} />
+          <div>
+            <div style={{ fontSize: 13, fontWeight: 600, color: text }}>145+ puntos en tiempo real</div>
+            <div style={{ fontSize: 11, color: muted, marginTop: 2 }}>Ver mapa completo en Google Maps</div>
+          </div>
+          <svg style={{ marginLeft: 'auto', flexShrink: 0 }} width="16" height="16" viewBox="0 0 24 24" fill={muted}>
+            <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
+          </svg>
+        </a>
+      )}
 
       {/* Emergency filter */}
       {emergencias.length > 1 && (
@@ -90,33 +104,13 @@ export default function ListaPuntos({ tipo = 'acopio' }) {
         </div>
       )}
 
-      {/* Category filter chips */}
-      {!isAlbergue && (
-        <div style={{ padding: '10px 18px 0', overflowX: 'auto', whiteSpace: 'nowrap', display: 'flex', gap: 8, scrollbarWidth: 'none' }}>
-          {['', 'Alimentos', 'Medicamentos', 'Higiene', 'Agua', 'Ropa y Abrigo', 'Colchonetas y Cobijas', 'Herramientas', 'Otro'].map(cat => (
-            <button
-              key={cat}
-              onClick={() => setCategoriaFiltro(cat)}
-              style={{
-                flexShrink: 0, padding: '5px 12px', borderRadius: 20, fontSize: 11, fontWeight: 600,
-                border: 'none', cursor: 'pointer',
-                background: categoriaFiltro === cat ? accentColor : '#21262d',
-                color: categoriaFiltro === cat ? 'white' : muted,
-              }}
-            >
-              {cat || 'Todos'}
-            </button>
-          ))}
-        </div>
-      )}
-
       {/* List */}
       <div style={{ padding: '12px 18px 0' }}>
         {loading ? (
           <div style={{ textAlign: 'center', padding: '60px 0', color: muted, fontSize: 14 }}>
             Cargando...
           </div>
-        ) : puntosVisibles.length === 0 ? (
+        ) : puntos.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '60px 0' }}>
             <div style={{ fontSize: 48, marginBottom: 12, opacity: 0.3 }}>
               <svg width="64" height="64" viewBox="0 0 24 24" fill={muted}><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>
@@ -128,7 +122,7 @@ export default function ListaPuntos({ tipo = 'acopio' }) {
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            {puntosVisibles.map(p => (
+            {puntos.map(p => (
               <div key={p.id} style={{ background: card, border: `1px solid ${border}`, borderRadius: 16, overflow: 'hidden' }}>
                 {/* Card header */}
                 <div style={{ background: accentColor, padding: '14px 16px' }}>
